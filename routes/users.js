@@ -48,20 +48,11 @@ router.post('/verifyOtp',userControllers.verifyOtp)
 router.get('/edit',auth.isLogin,userControllers.editProfile)
   router.post('/edit',userControllers.updateProfile)
 
-
-
-
-
-// router.get('/cart',auth.isLogin,userControllers.loadCart)
-
-
-
  router.post('/addtocart',auth.isLogin,userControllers.addToCart)
 router.get('/cart',auth.isLogin,userControllers.getCart)
+router.post('/change-product-quantity',userControllers.changeQuantity)
 
 
-// router.get("/category", adminAuth.isLogin, adminController.loadCategory);
-// router.post("/category", adminController.addCategory);
 
 router.get('/checkout',auth.isLogin,userControllers.checkoutPage)
 

@@ -137,34 +137,7 @@ const adminLogout = async(req,res)=>{
   };
 
 
-  // upload.array('image',5)(req, res, async (err) => {
-  //   if (err) {
-  //     console.log(err);
-  //     return next(err);
-  //   }
-  // try{
-  //   const newProduct = new Product({
-  //       brand: req.body.brand,
-  //       productName: req.body.productname,
-  //       category:req.body.category,
-  //       price: req.body.price,
-  //       offPrice:req.body.dealprice,
-  //       quantity:req.body.stock,
-  //       images: req.files.map(file => file.filename),
-  //       description:req.body.Description,
-  //       strapColour:req.body.strapColour,
 
-  //   });
-
-  //  await Product.create(newProduct);
- 
-   
-  // }catch(error){
-  //   console.log(error);
-  // }
-  // });
-  // res.redirect('/admin/productInfo') 
-  // }
 
 
 
@@ -221,6 +194,7 @@ const adminLogout = async(req,res)=>{
 
 const editProduct = async (req, res) => {
   try {
+   
     const id = req.query.id;
     const productData = await Product.findById(id).lean();
     if (productData) {
@@ -237,6 +211,12 @@ const editProduct = async (req, res) => {
 
 const updateProduct = async (req, res) => {
   try {
+
+     //here###
+     var arrayImage=[]
+     for (let i = 0; i < req.files.length; i++) {
+       arrayImage[i] = req.files[i].filename;
+     }
     const id = req.body.id;
     const updatedProduct = {
       brand: req.body.brand,
@@ -244,6 +224,7 @@ const updateProduct = async (req, res) => {
       category: req.body.category,
       price: req.body.price,
       images: req.body.images,
+      images: arrayImage,
       description: req.body.description,
     };
 

@@ -1,6 +1,6 @@
 
 const User = require("../models/userModel")
-
+const mongoose=require("mongoose")
 
 const bcrypt=require('bcrypt')
 const nodemailer= require('nodemailer')
@@ -295,21 +295,27 @@ const singleProductDetails=async(req,res)=>{
   }
 }
 
-// const viewPage =  async (req, res) => {
-//   try {
-//     const productId = req.query.id;
-  
-//     const singleProduct = await Product.findOne({ _id: productId }).lean()
- 
 
-//     res.render("users/view-product", {
-//       singleProduct: singleProduct
-//     });
-//   } catch (error) {
-//     console.log(error.message);
-//     res.render("404");
-//   }
-// };
+
+const getOtp=(req,res)=>{
+  res.render('users/otp')
+}
+const sendOtp=(req,res)=>{
+client.verify.v2
+.services(verifySid)
+.verifications.create({ to: "+916235095693", channel: "sms" })
+.then((verification) => console.log(verification.status))
+res.render('users/otpVerification')
+}
+
+const verifyOtp=(req,res)=>{
+  otpCode=req.body.otp
+  client.verify.v2
+    .services(verifySid)
+    .verificationChecks.create({ to: "+916235095693", code: otpCode })
+    .then((verification_check) => console.log(verification_check.status))
+  
+}
 
 
 
@@ -400,70 +406,12 @@ const updateProfile = async (req, res) => {
 
 
 
-// const loadCart=async(req,res)=>{
-//   try{
-//     res.render('users/cart')
-//   }catch(error){
-//     console.log(error.message);
-//   }
-// }
-
-// const getCart = async (req, res) => {
-//   try {
-//     const userId = req.session.userId;
-  
-//     const userCartData = await Cart.findOne({ userId: userId })
-//       .populate("product.productId").lean()
-//       .exec();
-
-//       const productId = userCartData.product.map((data) => {
-//         return {
-//           id: data.productId._id.toString()
-//         };
-//       });
-      
-      
-
-//     let totalPrice = 0;
-
-//     if (
-//       userCartData &&
-//       userCartData.product &&
-//       userCartData.product.length > 0
-//     ) {
-//       var ProductPrice = [];
-
-//       for (let i = 0; i < userCartData.product.length; i++) {
-//         ProductPrice[i] =
-//           userCartData.product[i].productId.price * userCartData.product[i].kg;
-//         totalPrice += ProductPrice[i];
-//       }
-//     }
-//     // if(totalPrice>1000){
-//     //   shipping==0
-//     //  }else{
-//     //    shipping==100
-//     //  }
-
-//     res.render("cart", { userCartData, totalPrice, ProductPrice ,productId});
-//   } catch (error) {
-//     console.log(error.message);
-//     res.render("404");
-//   }
-// };
-
-
-
-
-
-
-
 
 
 
 const  addToCart= async (req, res) => {
     try {
-      console.log("cart loading");
+      
       const proId = req.body.productId;
       console.log(proId,"is here");
             
@@ -494,7 +442,9 @@ const  addToCart= async (req, res) => {
       } else {
         cart.products[existingProductIndex].quantity += 1;
         const product = await Product.findById(proId).lean();
-        cart.products[existingProductIndex].total += product.price; // Update the total by adding the price of the product
+
+        // Update the total by adding the price of the product
+        cart.products[existingProductIndex].total += product.price; 
       }
 
       // Calculate the updated total amount for the cart
@@ -506,85 +456,154 @@ const  addToCart= async (req, res) => {
       await cart.save();
      
 
-      // Send a response indicating success or any other relevant data
       res.status(200).json({ message: "Product added to cart successfully" });
     } catch (error) {
-      // Handle any errors that occurred during the process
       res.status(500).json({ error: error.message });
     }
   }
   
      
 
-// const loadCartPage=async(req,res)=>{
-//   try{
-//     res.render('users/load-cart')
-//   }catch(error){
-//     console.log(error.message);
-//   }
-// }
 
-const getCart = async (req, res) => {
-    try {
-      const userId = req.session.user_id;
-      
+
+
+
+
+
+const getCart=async(req,res)=>{
   
-          const userCartData = await Cart.findOne({ user_id: userId })
-            .populate("products.productId").lean()
+  try{
+    console.log("entered loading cart page");
+      const check = await Cart.findOne({ user_id: req.session.user_id });
+    
+        console.log("checking no 1", check, "this is cart");
+        if (check) {
+          const cart = await Cart.findOne({ user_id: req.session.user_id })
+            .populate({
+              path: "products.productId",
+            })
+            .lean()
             .exec();
-            // console.log(userCartData,"#A2");
-      
-       
-          
-            
-      
-          let totalPrice = 0;
-         
-          if (  userCartData &&  userCartData.products && userCartData.products.length > 0 )   
-           {
-            var ProductPrice = [];
-            for (let i = 0; i < userCartData.products.length; i++) {
-              ProductPrice[i] =
-                userCartData.products[i].productId.price * userCartData.products[i].quantity
-              totalPrice += ProductPrice[i];
-            }
-            console.log(totalPrice,"#A4");
-          }
-
-          const productId = userCartData.products.map((data) => {
+          console.log(cart, "checking no 2");
+          console.log("products", cart.products);
+          const products = cart.products.map((product) => {
+            const total =
+              Number(product.quantity) * Number(product.productId.price);
             return {
-              id: data.productId._id.toString(),
-              brand: data.productId.brand,
-              productname : data.productId.productname,
-              category: data.productId.category,
-              price:data.productId.price,
-              images:data.productId.images,
-              description:data.productId.description,
-              totalPrice,
-              ProductPrice
+              _id: product.productId._id.toString(),
+              brand: product.productId.brand,
+              productname: product.productId.productname,
+              images: product.productId.images,
+              price: product.productId.price,
+              description: product.productId.description,
+              quantity: product.quantity,
+              total,
+              user_id: req.session.user_id,
             };
           });
+          console.log("passing products data is :", products);
     
-          
-      
-      res.render("users/cart", { userCartData ,productId});
-      console.log(userCartData,"userCartData");
-      console.log(totalPrice,"total price");
-      console.log(ProductPrice,"Product price");
-      console.log(productId,"productId");
+          const total = products.reduce(
+            (sum, product) => sum + Number(product.total),
+            0
+          );
+          console.log(total,"total ");
+    
+          const finalAmount = total;
+    
+          // Get the total count of products
+          const totalCount = products.length;
+          console.log(totalCount);
+          res.render("users/cart", {
+            products,
+            total,
+            totalCount,
+            subtotal: total,
+            finalAmount,
+          });
+          console.log(products,total,totalCount,finalAmount);
+        } else {
+          res.render("users/cart");
+        }
 
+  }catch(error){
+    console.log(error.message);
+  }
+}
+
+
+
+
+
+  const changeQuantity = async (req, res) => {
+    
+    try {
+
+         const userId = new mongoose.Types.ObjectId(req.body.userId);
+        const productId = new mongoose.Types.ObjectId(req.body.productId);
+        const quantity = req.body.quantity;
+
+        console.log("Hello there",userId,productId,quantity);
+
+        const cartFind = await Cart.findOne({user_id: userId});
+        const cartId = cartFind._id;
+        const count = req.body.count;
+        console.log(userId, "userId");
+        console.log(productId, 'productid');
+        console.log(quantity, 'quantity');
+        console.log(cartId, 'cartId');
+        console.log(count, 'count');
+
+        // Find the cart for the given user and product
+        const cart = await Cart.findOneAndUpdate(
+            { user_id: userId, 'products.productId': productId },
+            { $inc: { 'products.$.quantity': count } },
+            { new: true }
+        ).populate('products.productId');
+
+        // Update the total for the specific product in the cart
+        const updatedProduct = cart.products.find(product => product.productId._id.equals(productId));
+        updatedProduct.total = updatedProduct.productId.price * updatedProduct.quantity;
+        await cart.save();
+
+        // Check if the quantity is 0 or less
+        if (updatedProduct.quantity <= 0) {
+            // Remove the product from the cart
+            cart.products = cart.products.filter(product => !product.productId._id.equals(productId));
+            await cart.save();
+            const response = { deleteProduct: true };
+            console.log(response);
+            return res.json(response);
+        }
+
+        // Calculate the new subtotal for all products in the cart
+        const subtotal = cart.products.reduce((acc, product) => {
+            return acc + product.total;
+        }, 0);
+
+        // Prepare the response object
+        const response = {
+            quantity: updatedProduct.quantity,
+            subtotal: subtotal
+        };
+
+        console.log(response);
+        return res.json(response);
     } catch (error) {
-      console.log(error.message);
-      res.render("users/cart");
+        console.log(error);
+        res.status(500).json({ error: error.message });
     }
-  };
+};
 
 
 
 
+    
 
 
-const checkoutPage=async(req,res)=>{
+
+
+var checkoutPage=async(req,res)=>{
   try{
     res.render('users/checkout')
   }catch(error){
@@ -592,26 +611,6 @@ const checkoutPage=async(req,res)=>{
   }
 }
 
-const getOtp=(req,res)=>{
-    res.render('users/otp')
-}
-const sendOtp=(req,res)=>{
-  client.verify.v2
-  .services(verifySid)
-  .verifications.create({ to: "+916235095693", channel: "sms" })
-  .then((verification) => console.log(verification.status))
-  res.render('users/otpVerification')
-}
-
-const verifyOtp=(req,res)=>{
-    otpCode=req.body.otp
-    client.verify.v2
-      .services(verifySid)
-      .verificationChecks.create({ to: "+916235095693", code: otpCode })
-      .then((verification_check) => console.log(verification_check.status))
-    
-
-}
 module.exports={
   loadSignup,
   insertUser,
@@ -626,7 +625,7 @@ module.exports={
   
 
 
-  // productDetails,
+ 
     profilePage,
     editProfile,
       updateProfile,
@@ -641,9 +640,10 @@ module.exports={
 
   aboutPage,
   userLogout,
-  // loadCart,
+  
   getCart,
    addToCart,
+  changeQuantity,
  
 }
 

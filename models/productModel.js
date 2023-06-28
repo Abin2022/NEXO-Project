@@ -36,6 +36,10 @@ const productSchema = new Schema({
     type: Boolean,
     default: false,
   },
+  Subtotal:{
+    type:Number,
+    // required:true,
+  }
 });
 
 const Products = mongoose.model("Product", productSchema);

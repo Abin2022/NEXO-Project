@@ -236,12 +236,12 @@
                             
                            
                                  
-                            <h4 class="title"><a href="#"  >{{singleProduct.brand}}</a></h4>
-                            <h4 class="price">{{ singleProduct.productname}}</h4>
+                            <h4 class="title"><a href="#" style="color:black;" >{{singleProduct.brand}} </a></h4>
+                            <h4 class="price"><a href="#" style="color: rgb(33, 31, 31)">{{ singleProduct.productname}}</a></h4>
 
                             <h4 class="price">Price: ₹{{ singleProduct.price}}</h4>
 
-                            <p class="available">Available: <span class="text-muted">In Stock</span></p>
+                            <p class="available">Available: <span class="text-muted" style="color:crimson">In Stock</span></p>
 
                             <div class="single_product_ratings mb-15">
                                 <i class="fa fa-star" aria-hidden="true"></i>
@@ -252,14 +252,14 @@
                             </div>
 
                             <div class="widget size mb-50">
-                                <h6 class="widget-title"> Available Colour's</h6>
+                                <h6 class="widget-title"> </h6>
                                 <div class="widget-desc">
                                     <ul>
-                                        <li><a href="#">Black  </a></li>
+                                        {{!-- <li><a href="#">Black  </a></li>
                                         <li><a href="#" >White</a></li>
                                         <li><a href="#">Blue</a></li>
                                         <li><a href="#">Gray</a></li>
-                                        <li><a href="#">Red</a></li>
+                                        <li><a href="#">Red</a></li> --}}
                                         {{!-- <li><a href="#"> </a></li> --}}
                                     </ul>
                                 </div>
@@ -268,9 +268,9 @@
                             <!-- Add to Cart Form -->
                             <form class="cart clearfix mb-50 d-flex" method="post">
                               
-                                <a href="#" class="btn cart-submit d-block " onclick="addToCart('{{singleProduct.user_id}}',event), showSweetAlert()" style="display: inline-block; text-align: center;padding: 10px;">Add to cart</a>
+                                {{!-- <a href="#" class="btn cart-submit d-block " onclick="addToCart('{{singleProduct.user_id}}',event), showSweetAlert()" style="display: inline-block; text-align: center;padding: 10px;">Add to cart</a> --}}
                                 
-                               <a href="#" class="btn cart-submit d-block" style="display: inline-block; text-align: center;padding: 10px;">Add to Whishlist</a>
+                               <a href="/checkout" class="btn cart-submit d-block" style="display: inline-block; text-align: center;padding: 10px;">Buy Now</a>
 
                                  <!-- Wishlist -->
                                             <div class="modal_pro_wishlist">

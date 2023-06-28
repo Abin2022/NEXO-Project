@@ -124,7 +124,7 @@
                                              
                                             <li class="nav-item active">  <a class="nav-link" href="/cart">Cart<i class="ti-bag"></i> </a></li>
                                             
-                                            <li class="nav-item"><a class="nav-link" href="/profile">My-Profile</a></li> 
+                                            <li class="nav-item"><a class="nav-link" href="/profile">Profile</a></li> 
 
                                              
                                                
@@ -234,7 +234,7 @@
                 <div class="product-img">
 
                    
-                      <a href="/product-details?id={{this._id}}">   <img src="/uploads/{{images.[0]}}" alt="Image" >
+                      <a href="/product-details?id={{this._id}}">  <img src="/uploads/{{images.[0]}}" alt="Image" >
                       </a>
                       
 
@@ -251,6 +251,7 @@
                     <h6>Price:₹{{this.price}}</h6>
                       
                     <!-- Add to Cart -->
+                    
                   <a href="#" class="add-to-cart-btn" onclick="addToCart('{{this._id}}',event), showSweetAlert()">Add to cart</a>
 
                     {{!-- <a href="/cart" class="add-to-cart-btn">ADD TO CART</a> --}}

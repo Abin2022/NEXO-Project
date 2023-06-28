@@ -167,7 +167,9 @@
         <!-- ****** Top Discount Area End ****** -->
  
   <!-- ****** Cart Area Start ****** -->
-{{#if userCartData}}
+  
+{{#if products}}
+
 <div class="cart_area section_padding_100 clearfix">
     <div class="container">
 
@@ -185,21 +187,54 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {{#each productId}}
+                            {{#each products}}
                             <tr>
                                 <td class="cart_product_img d-flex align-items-center">
                                     <a href="/product-details?id={{this.id}}"><img src="/uploads/{{images.[0]}}" alt="Image"></a>
-                                    <h6>{{productname}}</h6>
+                                    <h6>{{this.productname}}</h6>
                                 </td>
-                                <td class="price"><span>₹{{price}}</span></td>
+                                <td class="price"><span>₹{{this.price}}</span></td>
                                 <td class="qty">
-                                    <div class="quantity">
+                                    {{!-- <div class="quantity">
                                         <span class="qty-minus" onclick="var effect = document.getElementById('qty'); var qty = effect.value; if( !isNaN( qty ) &amp;&amp; qty &gt; 1 ) effect.value--;return false;"><i class="fa fa-minus" aria-hidden="true"></i></span>
                                         <input type="number" class="qty-text" id="qty" step="1" min="1" max="99" name="quantity" value="1">
-                                        <span class="qty-plus" onclick="var effect = document.getElementById('qty'); var qty = effect.value; if( !isNaN( qty )) effect.value++;return false;"><i class="fa fa-plus" aria-hidden="true"></i></span>
-                                    </div>
+                                        <span class="qty-plus" onclick="var effect = document.getElementById('qty'); var qty = effect.value; if( !isNaN( qty )) effect.value++;return false;"><i class="fa fa-plus" ></i></span>
+                                    </div> --}}
+                                    {{!-- <div class="input-group" >
+          <div class="input-group-prepend">
+            <button class="btn btn-outline-secondary" id="decrementBtn" onclick="changeQuantity('{{this._id}}', -1, '{{this.user_id}}', {{this.quantity}})">-</button>
+          </div>
+          <input type="text" class="form-control text-center" id="quantityInput_{{this._id}}" value="{{this.quantity}}" min="1" readonly>
+          <div class="input-group-append">
+            <button class="btn btn-outline-secondary" id="incrementBtn" onclick="changeQuantity('{{this._id}}', 1, '{{this.user_id}}', {{this.quantity}})">+</button >
+          </div>
+        </div>
+         --}}
+         <div class="input-group">
+  <div class="input-group-prepend">
+    <button class="btn btn-outline-secondary" id="decrementBtn" onclick="changeQuantity('{{this._id}}', -1, '{{this.user_id}}', {{this.quantity}})">-</button>
+  </div>
+  <input type="text" class="form-control text-center" id="quantityInput_{{this._id}}" value="{{this.quantity}}" min="1" readonly>
+  <div class="input-group-append">
+    <button class="btn btn-outline-secondary" id="incrementBtn" onclick="changeQuantity('{{this._id}}', 1, '{{this.user_id}}', {{this.quantity}})">+</button>
+  </div>
+</div>
+
+
+
+
+
+   
+ 
+
+
+
+
+
+
+
                                 </td>
-                                <td class="total_price"><span>₹{{ProductPrice}}</span></td>
+                                <td class="total_price"><span>₹{{total}}</span></td>
                             </tr>
                             {{/each}}
                         </tbody>
@@ -211,8 +246,8 @@
                         <a href="/home">Continue shopping</a>
                     </div>
                     <div class="update-checkout w-50 text-right">
-                        <a href="#">Clear cart</a>
-                        <a href="#">Update cart</a>
+                        {{!-- <a href="#">Clear cart</a>
+                        <a href="#">Update cart</a> --}}
                     </div>
                 </div>
             </div>
@@ -220,7 +255,7 @@
 
         <div class="row">
             <div class="col-12 col-md-6 col-lg-4">
-                <div class="coupon-code-area mt-70">
+                {{!-- <div class="coupon-code-area mt-70">
                     <div class="cart-page-heading">
                         <h5>Coupon code</h5>
                         <p>Enter your coupon code</p>
@@ -229,7 +264,7 @@
                         <input type="search" name="search" placeholder="#mycoupon">
                         <button type="submit">Apply</button>
                     </form>
-                </div>
+                </div> --}}
             </div>
             <div class="col-12 col-md-6 col-lg-4">
                 {{!-- <div class="shipping-method-area mt-70">
@@ -254,35 +289,48 @@
                     </div>
                 </div> --}}
             </div>
+           
             <div class="col-12 col-lg-4">
+                 
                 <div class="cart-total-area mt-70">
                     <div class="cart-page-heading">
                         <h5>Cart total</h5>
                         <p>Final info</p>
                     </div>
-
+                    
+                     
                     <ul class="cart-total-chart">
-                      {{#each productId}}
-  <li><span>Subtotal</span> <span>₹{{this.totalPrice}}</span></li>
-{{/each}}
+                    
+  <li><span>Subtotal</span> <span>₹{{subtotal}}</span></li>
+
+                       
 
                         <li><span>Shipping</span> <span>Free</span></li>
                         <li>
+                            
                             <span><strong>Total</strong></span>
+                            
                             <span>
                                 <strong>
-                                    {{#each productId}}
-                                    ₹{{totalPrice}}
-                                    {{/each}}
+                                   
+                                    ₹{{total}}
+                                    
                                 </strong>
                             </span>
+                     
                         </li>
+                    
                          
                     </ul>
+                        
+                  
+                     {{!-- <a href="/product-details?id={{this.id}}"><img src="/uploads/{{images.[0]}}" alt="Image"></a> --}}
 
-                    <a href="/checkout" class="btn karl-checkout-btn">Proceed to checkout</a>
+
+                    <a href="/checkout?id={{this.id}}" class="btn karl-checkout-btn">Proceed to checkout</a>
                 </div>
             </div>
+             
         </div>
 
     </div>
@@ -408,12 +456,56 @@
     </div>
 
 
-
-
-
-
-
     </div>
+
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+  function changeQuantity(proId, count, userId, quantity) {
+   
+
+    $.ajax({
+      url: "/change-product-quantity",
+      method: "post",
+      data: {
+        productId: proId,
+        count: count,
+        userId: userId,
+        quantity: quantity,
+      },
+    success: (response) => {
+      console.log(response)
+       if(response.deleteProduct){
+          location.reload(); // Reload the page
+       }else{
+             console.log(response,'ajax response')
+        const quantityInput = document.getElementById(`quantityInput_${proId}`);
+        quantityInput.value = response.quantity;
+
+        
+        const productTotal = document.querySelector(`#productTotal_${proId}`);
+        productTotal.textContent = response.productTotal;
+
+        const subtotal = document.getElementById(`summary`);
+        subtotal.textContent = response.subtotal;
+
+        const summarySubtotal = document.getElementById(`summary-subtotal`);
+        summarySubtotal.textContent = response.subtotal
+        
+       }
+     
+          
+      }
+       
+    
+    })
+  }
+   </script>
+
+
+
+
     <!-- /.wrapper end -->
 
     <!-- jQuery (Necessary for All JavaScript Plugins) -->

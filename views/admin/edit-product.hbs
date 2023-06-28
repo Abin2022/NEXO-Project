@@ -72,13 +72,11 @@
               <div class="mb-3">
                          <label for="category" class="form-label">Category</label>
                          <select name="category" class="form-control" required>
-                            <option selected>{{product.category}}</option>
+                            <option selected>{{product.category}}</option> --}}
                             {{#each categories}}                              
-                               {{!-- Skip rendering the option for unlisted categories --}} 
-                             {{!-- <option value="{{this._id}}">{{this.category}}</option> --}}
-                              <option value="{{this._id}}">{{this.category}}</option>
-                              
+                              <option value="{{this._id}}">{{this.category}}</option> 
                             {{/each}}
+                           
                         </select>
                     </div>
                     {{!-- <div class="mb-3">
@@ -98,8 +96,8 @@
                 <input type="Number" name="price" class="form-control" value="{{product.price}}" required>
             </div>
             <div class="mb-3">
-                <label for="email" class="form-label">Image</label>
-                <input type="String" name=" images" class="form-control" value="{{product.images}}" required>
+                <label for="image" class="form-label">Image</label>
+                <input type="file" name=" image" class="form-control" value="{{product.image}}"  multiple required>
             </div>
             <div class="mb-3">
                 <label for="email" class="form-label">Description</label>

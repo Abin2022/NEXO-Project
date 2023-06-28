@@ -48,7 +48,10 @@ router.post(
 );
 
 router.get("/edit-product",adminAuth.isLogin,adminController.editProduct)
-router.post("/edit-product",adminAuth.isLogin,adminController.updateProduct)
+router.post("/edit-product",adminAuth.isLogin,
+uploads.array("image",4),
+adminController.updateProduct)
+
 router.get(
   "/unlist-products",
   adminAuth.isLogin,
