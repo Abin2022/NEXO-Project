@@ -43,7 +43,7 @@ router.get('/home',adminAuth.isLogin,adminController.loadDashboard)
  router.get("/add-products", adminAuth.isLogin, adminController.loadProducts);
 router.post(
   "/add-products",
-  uploads.single("image"),
+  uploads.array("image",4),
   adminController.insertProducts
 );
 

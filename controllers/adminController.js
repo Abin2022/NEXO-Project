@@ -92,12 +92,20 @@ const adminLogout = async(req,res)=>{
   
   const insertProducts = async (req, res) => {
     try {
+       var arrayImage=[]
+      for (let i = 0; i < req.files.length; i++) {
+        arrayImage[i] = req.files[i].filename;
+      }
+      
+
       const newProduct = new Product({
         brand: req.body.brand,
         productname: req.body.productname,
         category: req.body.category,
         price: req.body.price,
-        images: req.file.filename,
+        images: arrayImage,
+        // images: req.file.filename,
+        // images: req.files.map(file => file.filename),
         description: req.body.description,
       });
   
@@ -129,50 +137,123 @@ const adminLogout = async(req,res)=>{
   };
 
 
-  const editProduct = async (req, res) => {
-    try {
-      const id = req.query.id;
-      console.log(id);
-      const productData = await Product.findById({ _id: id }).lean();
-      console.log(productData);
-      if (productData) {
+  // upload.array('image',5)(req, res, async (err) => {
+  //   if (err) {
+  //     console.log(err);
+  //     return next(err);
+  //   }
+  // try{
+  //   const newProduct = new Product({
+  //       brand: req.body.brand,
+  //       productName: req.body.productname,
+  //       category:req.body.category,
+  //       price: req.body.price,
+  //       offPrice:req.body.dealprice,
+  //       quantity:req.body.stock,
+  //       images: req.files.map(file => file.filename),
+  //       description:req.body.Description,
+  //       strapColour:req.body.strapColour,
+
+  //   });
+
+  //  await Product.create(newProduct);
+ 
+   
+  // }catch(error){
+  //   console.log(error);
+  // }
+  // });
+  // res.redirect('/admin/productInfo') 
+  // }
+
+
+
+
+
+
+//   const editProduct = async (req, res) => {
+//     try {
+//       const id = req.query.id;
+//       console.log(id);
+//       const productData = await Product.findById({ _id: id }).lean();
+//       console.log(productData);
+//       if (productData) {
   
-        res.render("admin/edit-product", {
+//         res.render("admin/edit-product", {
           
-          product: productData,
-        });
-      } else {
-        res.redirect("/admin/home");
-      }
-    } catch (error) {
-      console.log(error.message);
-    }
-  };
+//           product: productData,
+//         });
+//       } else {
+//         res.redirect("/admin/home");
+//       }
+//     } catch (error) {
+//       console.log(error.message);
+//     }
+//   };
 
   
-const updateProduct=async(req,res)=>{
-  try {
-    const productData = await Product.findByIdAndUpdate(
-      { _id: req.body.id },
-      {
-        $set: {
-          brand: req.body.brand,
-          productname: req.body.productname,
-          category: req.body.category,
-          price: req.body.price,
-          images: req.body.images,
-          description: req.body.description,
-        },
-      }
-    );
+// const updateProduct=async(req,res)=>{
+//   try {
+//     const productData = await Product.findByIdAndUpdate(
+//       { _id: req.body.id },
+//       {
+//         $set: {
+//           brand: req.body.brand,
+//           productname: req.body.productname,
+//           category: req.body.category,
+//           price: req.body.price,
+//           images: req.body.images,
+//           description: req.body.description,
+//         },
+//       }
+//     );
 
-    res.redirect("/admin/home");
+//     res.redirect("/admin/home");
 
     
+//   } catch (error) {
+//     console.log(error.message);
+//   }
+// }
+
+
+
+
+const editProduct = async (req, res) => {
+  try {
+    const id = req.query.id;
+    const productData = await Product.findById(id).lean();
+    if (productData) {
+      res.render("admin/edit-product", {
+        product: productData,
+      });
+    } else {
+      res.redirect("/admin/home");
+    }
   } catch (error) {
     console.log(error.message);
   }
-}
+};
+
+const updateProduct = async (req, res) => {
+  try {
+    const id = req.body.id;
+    const updatedProduct = {
+      brand: req.body.brand,
+      productname: req.body.productname,
+      category: req.body.category,
+      price: req.body.price,
+      images: req.body.images,
+      description: req.body.description,
+    };
+
+    await Product.findByIdAndUpdate(id, updatedProduct);
+    res.redirect("/admin/home");
+  } catch (error) {
+    console.log(error.message);
+  }
+};
+
 
 
 const unlistProducts = async (req, res) => {

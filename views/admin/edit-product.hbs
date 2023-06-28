@@ -75,11 +75,23 @@
                             <option selected>{{product.category}}</option>
                             {{#each categories}}                              
                                {{!-- Skip rendering the option for unlisted categories --}} 
-                             <option value="{{this._id}}">{{this.category}}</option>
+                             {{!-- <option value="{{this._id}}">{{this.category}}</option> --}}
+                              <option value="{{this._id}}">{{this.category}}</option>
                               
                             {{/each}}
                         </select>
                     </div>
+                    {{!-- <div class="mb-3">
+    <label for="category" class="form-label">CATEGORY</label>
+    <select name="category" class="form-control" required>
+        {{#each categories}}
+        <option value="{{this._id}}" {{#if (isEqual this._id product.category)}}selected{{/if}}>
+            {{this.category}}
+        </option>
+        {{/each}}
+    </select>
+</div> --}}
+
 
             <div class="mb-3">
                 <label for="email" class="form-label">Price</label>
