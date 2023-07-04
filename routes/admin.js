@@ -64,6 +64,7 @@ router.get("/list-products", adminAuth.isLogin, adminController.listProducts);
 router.get("/category", adminAuth.isLogin, adminController.loadCategory);
 router.post("/category", adminController.addCategory);
 
+
 router.get("/user",adminAuth.isLogin,adminController.addUser)
 router.get("/edit-user",adminAuth.isLogin,adminController.editUser)
 router.post("/edit-user",adminAuth.isLogin,adminController.updateUser)
@@ -75,7 +76,7 @@ router.get("/blockeduserlist",adminAuth.isLogin,adminController.blockedUserlist)
 router.get("/unblockUser",adminAuth.isLogin,adminController.unblockUser)
 
 
-
+router.get('/orders',adminAuth.isLogin,adminController.getUserOrders)
 
 
 

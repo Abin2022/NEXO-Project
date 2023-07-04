@@ -13,7 +13,8 @@ const { userLogout } = require("./userController");
 
 const Category = require("../models/categoryModel");
 const { log } = require("handlebars/runtime");
-
+const Order = require('../models/orderModel')
+const moment = require("moment-timezone")
 
 
 
@@ -428,6 +429,37 @@ const unblockUser = async (req, res) => {
 };
 
 
+// const getUserOrders=async(req,res)=>{
+//    try {
+//       res.render('admin/userOrders')
+//    } catch (error) {
+//     console.log(error.message);
+//    }
+// }
+
+const getUserOrders = async (req, res) => {
+  try {
+    console.log('entered into getUSERORDERS'); 
+    const orderData = await Order.find().populate("userId").lean();
+    console.log(orderData, "order data coming");
+    const orderHistory = orderData.map((history) => {
+      let createdOnIST = moment(history.date)
+        .tz("Asia/Kolkata")
+        .format("DD-MM-YYYY h:mm A");
+
+      return { ...history, date: createdOnIST, username: history.userId.name };
+    });
+    console.log(orderHistory, "order serial numbers");
+    res.render("admin/userOrders", {
+      
+      orderData: orderHistory,
+    });
+  } catch (error) {
+    console.log(error.message);
+  }
+};
+
+
 
 
 
@@ -455,6 +487,8 @@ module.exports = {
      updateProduct,
      unlistProducts,
      listProducts,
+
+     getUserOrders,
     
 
 }

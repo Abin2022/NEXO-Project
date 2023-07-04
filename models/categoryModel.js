@@ -14,5 +14,9 @@ const categorySchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  edit:{
+    type:String,
+    
+  }
 });
 module.exports = mongoose.model("Category", categorySchema);

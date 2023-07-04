@@ -20,8 +20,22 @@ const authToken ="134aada0a6f8aeea3a9c3928db09a783";
 const verifySid = "VAb65553a60d1c6c15f8fb69e14c75d2f9";
 const client = require("twilio")(accountSid, authToken);
 const Cart= require("../models/cartModel")
+const Addresses = require("../models/addressesModel")
+var Address=require("../models/addressesModel")
+const Order = require('../models/orderModel')
+const moment = require("moment-timezone")
+// const EventEmitter = require('events');
 
 
+
+
+
+
+
+
+
+
+const ObjectId = mongoose.Types.ObjectId;
 
 
 const securePassword =async(password)=>{
@@ -90,9 +104,10 @@ const insertUser=async(req,res)=>{
 
     if(userData){
       sendVerifyMail(req.body.name,req.body.email,userData._id)
-      res.render('users/signup')
+      res.render('users/login')
+
     }else{
-      res.render('users/signup')
+      res.render('users/signup',{message:"Error"})
     }
 
   }catch(error){
@@ -118,7 +133,7 @@ const verifyMail = async(req,res)=>{
 
 const loginLoad=async(req,res)=>{
   try{
-     res.render('users/signup',)
+     res.render('users/login',)
   }catch(error){
     console.log(error.message);
   }
@@ -136,18 +151,21 @@ const verifyLogin=async(req,res)=>{
     const passwordMatch=await bcrypt.compare(password,userData.password)
     if(passwordMatch){
       if(userData.is_verified === 0){
-   res.render('users/signup',{message:"Please Verify your Mail"})
-   console.log("message printed")
-      }else{
+   res.render('users/login',{message:"Please Verify your Mail"})
+   console.log("message printed.......................")
+      }else if(userData.blocked ===true){
+         res.render('users/block')
+      }
+      else{
         req.session.user_id=userData._id
         res.redirect('/home')
       }
 
     }else{
-      res.render('users/signup',{message:"Email and Password do not match"})
+      res.render('users/login',{message:"Email and Password do not match"})
     }
    }else{
-    res.render('users/signup',{message:"Email and Password do not match"})
+    res.render('users/login',{message:"Email and Password do not match"})
    }
 
   }catch(error){
@@ -224,6 +242,7 @@ const sendResetPasswordMail = async(name,email,token)=>{
     requireTls:true,
     auth:{
       user:config.emailUser,
+
       pass:config.emailpassword,
     }
    })
@@ -342,62 +361,63 @@ const userLogout = async(req,res)=>{
   }
 }
 
-const  profilePage=async(req,res)=>{
-try{
- 
-   const userData=await User.findById({_id:req.session.user_id})
-  res.render('users/profile',{
-    user:userData
-  })
-}catch(error){
-  console.log(error.message);
-}
-}
 
 
 
 
-//user profile edit and update
-const editProfile=async(req,res)=>{
-  try {
-    const id=req.query.id
-    const userData = await User.findById(
-      { _id:id });
-      if(userData){
-  res.render('users/edit',{user:userData})
-      }else{
-        res.redirect("/home");
-      }
-
-   
-
-    
-  } catch (error) {
-    console.log(error.message);
-  }
-}
 
 
 
-const updateProfile = async (req, res) => {
-  try {
-    const user_id = req.query.id; 
 
-    if (req.file) {
-      await User.findByIdAndUpdate({ _id: user_id }, {
-        $set: { name: req.body.name, email: req.body.email, mobile: req.body.mobile }
-      });
-    } else {
-      await User.findByIdAndUpdate({ _id: user_id }, {
-        $set: { name: req.body.name, email: req.body.email, mobile: req.body.mobile }
-      });
-    }
+//address for checckout Page
 
-    res.redirect('/home');
-  } catch (error) {
-    console.log(error.message);
-  }
-};
+
+
+// const addressList = async (req, res) => {
+//   try {
+//     const userId = req.session.user_id;
+
+//     const name = req.body.name;
+
+//     const city = req.body.city;
+//     const state = req.body.state;
+//     const pincode = req.body.pincode;
+//     const address = req.body.address;
+//     console.log(name,"name");
+
+//     console.log(city,"city");
+//     console.log('state',state);
+//     console.log('pincode',pincode);
+//     const newAddress = {
+//       name: name,
+
+//       address: address,
+//       city: city,
+//       state: state,
+//       pincode: pincode,
+//       is_default: false,
+//     };
+
+//     let userAddress = await Addresses.findOne({ user_id: userId });
+
+//     if (!userAddress) {
+//       newAddress.is_default = true;
+//       userAddress = new Addresses({ user_id: userId, addresses: [newAddress] });
+//     } else {
+//       userAddress.addresses.push(newAddress);
+//       if (userAddress.addresses.length === 1) {
+//         userAddress.addresses[0].is_default = true;
+//       }
+//     }
+
+//     await userAddress.save();
+//     console.log(userAddress, "useraddress");
+
+//     res.redirect("/address");
+//   } catch (error) {
+//     throw new Error(error.message+"Issue","HEllle");
+//   }
+// };
 
 
 
@@ -415,11 +435,8 @@ const  addToCart= async (req, res) => {
       const proId = req.body.productId;
       console.log(proId,"is here");
             
-
       let cart = await Cart.findOne({ user_id: req.session.user_id });
-     
-   
-
+    
       if (!cart) {
         let newCart = new Cart({ user_id: req.session.user_id, products: [] });
         await newCart.save();
@@ -595,21 +612,824 @@ const getCart=async(req,res)=>{
     }
 };
 
+const deleteProduct= async (req, res) => {
+  try {
+      const userId = new mongoose.Types.ObjectId(req.body.userId);
+      const productId = new mongoose.Types.ObjectId(req.body.productId);
 
+      // Find the cart with the specified user ID and product ID
+      const cart = await Cart.findOneAndUpdate(
+          { user_id: userId },
+          { $pull: { products: { productId: productId } } },
+          { new: true } // To return the updated cart document
+      );
 
+      if (cart) {
+          console.log(cart, 'updated cart');
+
+          // Product successfully removed from the cart
+          const response = { deleteProductFromCart: true };
+          console.log(response, 'response from userhelper');
+          return response;
+      } else {
+          // Cart or product not found
+          const response = { deleteProductFromCart: false };
+          console.log(response, 'response from userhelper');
+          return response;
+      }
+
+  } catch (error) {
+      console.log(error);
+      res.status(500).json({ error: error.message });
+  }
+}
 
     
 
 
 
 
-var checkoutPage=async(req,res)=>{
+// var checkoutPage=async(req,res)=>{
+//   try{
+//     res.render('users/checkout')
+//   }catch(error){
+//     console.log(error.message);
+//   }
+// }
+
+const blockUser=async(req,res)=>{
   try{
-    res.render('users/checkout')
+  res.render('users/block')
+
   }catch(error){
     console.log(error.message);
   }
 }
+
+
+
+  
+  
+  
+
+  
+  
+  // const updateProfile = async (req, res) => {
+  //   try {
+  //     const user_id = req.query.id; 
+  
+  //     if (req.file) {
+  //       await User.findByIdAndUpdate({ _id: user_id }, {
+  //         $set: { name: req.body.name, email: req.body.email, mobile: req.body.mobile }
+  //       });
+  //     } else {
+  //       await User.findByIdAndUpdate({ _id: user_id }, {
+  //         $set: { name: req.body.name, email: req.body.email, mobile: req.body.mobile }
+  //       });
+  //     }
+  
+  //     res.redirect('/home');
+  //   } catch (error) {
+  //     console.log(error.message);
+  //   }
+  // };
+  
+  
+
+
+
+  
+ 
+
+
+
+
+  //user-profile
+const profilePage = async (req, res) => {
+  try {
+    const userId = new mongoose.Types.ObjectId(req.session.user_id);
+    console.log(userId, "user id.....");
+    const userData = await User.findOne({ _id: userId }).lean();
+    const defaultAddress = await Address.findOne(
+      { user_id: userId, "addresses.is_default": true },
+      { "addresses.$": 1 }
+    ).lean();
+    console.log(defaultAddress, "defaultAddress");
+    if (defaultAddress) {
+      res.render("users/profile", {
+        userData,
+        defaultAddress: defaultAddress.addresses,
+      });
+    } else {
+      res.render("users/profile", { userData});
+    }
+  } catch (error) {
+    console.log(error.message);
+  }
+};
+
+  
+
+
+
+const editUser= async (req, res) => {
+  try {
+      // console.log(req.file, 'userimage');
+      const id = new mongoose.Types.ObjectId(req.session.user_id);
+      const userData = await User.findById({ _id: id }).lean();
+
+      if (!userData) {
+          throw new Error('User data not found');
+      }
+
+      let updatedUserData = {
+          // image:req.body.images,
+          name: req.body.name,
+          email: req.body.email,
+           mobile: req.body.mobile,
+          // address:req.body.address,
+          // city:req.body.city,
+          // state: req.body.state,
+          // pincode:req.body.pincode,
+      };
+      // if (req.file) {
+      //     // Check if a new image file is uploaded
+      //     updatedUserData.image = req.file.filename; // Update with the new image filename
+
+      // }
+
+      const updatedUser = await User.findByIdAndUpdate({ _id: id }, { $set: updatedUserData }, { new: true });
+      res.redirect('/profile');
+  } catch (error) {
+      throw new Error(error.message);
+  }
+}
+
+
+  
+
+
+const loadAddress = async (req, res) => {
+  try {
+    const userId = req.session.user_id;
+    const userAddress = await Address.findOne({user_id: userId })
+      .lean()
+      .exec();
+  console.log(userAddress,"Useraddress.........................");
+
+    if (userAddress) {
+      if (userAddress.addresses.length === 1) {
+        userAddress.addresses[0].is_default = true; 
+      }
+
+      const addressDetails = userAddress.addresses.map((address) => {
+        return {
+          name: address.name,
+          mobile:address.mobile,
+          address: address.address,
+          city: address.city,
+          state: address.state,
+          pincode: address.pincode,
+          _id: address._id,
+          is_default: address.is_default,
+          // image:address.images,
+
+        }; 
+      });
+
+      console.log(addressDetails, "addressdetails");
+      res.render("users/address", {  addressDetails });
+    } else {
+      res.render("users/address", {
+        addressDetails: [],
+      });
+
+    }
+  } catch (error) {
+
+    throw new Error(error.message);
+  }
+
+
+};
+
+
+
+const addAddress = async (req, res) => {
+  try {
+    // const userId = new mongoose.Types.ObjectId(req.session.user_id);
+    // const userData = await User.findOne({ _id: userId }).lean();
+
+     const userId = req.session.user_id;
+
+    //      const id = new mongoose.Types.ObjectId(req.session.user_id);
+
+  
+    const name = req.body.name;
+   const mobile=req.body.mobile;
+    const city = req.body.city;
+    const state = req.body.state;
+    const pincode = req.body.pincode;
+    const address = req.body.address;
+
+    
+
+    console.log(name,"name");
+    
+    console.log(city,"city");
+    console.log(state,'state');
+    console.log(address,'address');
+    console.log(pincode,"pincod");
+
+    const newAddress = {
+      name: name,
+      mobile:mobile,
+      address: address,
+      city: city,
+      state: state,
+      pincode: pincode,
+      is_default: false,
+    };
+
+    let userAddress = await Address.findOne({ user_id: userId });
+
+
+
+
+    if (!userAddress) {
+      // If the user doesn't have any address, create a new document
+      newAddress.is_default = true;
+      userAddress = new Address({ user_id: userId, address: [newAddress] });
+    } else {
+      // If the user already has an address, push the new address to the array
+      userAddress.addresses.push(newAddress);
+      // Check if there is only one address in the array
+      if (userAddress.addresses.length === 1) {
+        // If there is only one address, set it as the default
+        userAddress.addresses[0]. is_default = true;
+      }
+    }
+
+    await userAddress.save(); // Save the updated address document
+    console.log(userAddress, 'useraddress');
+
+    res.redirect('/address');
+  } catch (error) {
+    throw new Error(error.message);
+  }
+};
+
+
+
+const setAsDefault= async (req, res) => {
+  try {
+      const addressId = req.body.addressId;
+      const userId = req.session.user_id;
+      console.log(addressId,userId,"address and user id ");
+
+      // Find the current default address and unset its "isDefault" flag
+      await Address.findOneAndUpdate(
+          { user_id: userId, 'addresses.is_default': true },
+          { $set: { 'addresses.$.is_default': false } }
+      );
+      console.log(addressId,userId,"address and user id ");
+
+      // Set the selected address as the new default address
+      const defaultAddress = await Address.findOneAndUpdate(
+          { user_id: userId, 'addresses._id': addressId },
+          { $set: { 'addresses.$.is_default': true } }
+      );
+      console.log(addressId,userId,"address and user id ");
+
+      console.log(defaultAddress," def addres ");
+
+      const response = {
+          setDefault: true
+      }
+       console.log(response);
+      return response
+
+  } catch (error) {
+      res.status(500).json({ success: false, message: 'Failed to set address as default' });
+  }
+}
+
+
+
+// const addNewAddress= async (req, res) => {
+//   try {
+//       const userId = req.session.user_id
+//       const { 
+//         name,
+//          mobile, 
+//          homeAddress, 
+//          city, 
+//          street, 
+//          postalCode 
+//         } = req.body;
+
+//       console.log(name);
+//       console.log(mobile);
+
+//       console.log(city);
+//       console.log(street);
+//       console.log(postalCode);
+//       const newAddress = {
+//           name: name,
+//           mobile: mobile,
+//           homeAddress: homeAddress,
+//           city: city,
+//           street: street,
+//           postalCode: postalCode,
+//           isDefault: false, // Set the default flag to false by default
+//       };
+
+//       // Find the user's address document based on the user_id
+//       let userAddress = await Address.findOne({ user_id: userId });
+
+//       if (!userAddress) {
+//           // If the user doesn't have any address, create a new document
+//           newAddress.isDefault = true;
+//           userAddress = new Address({ user_id: userId, address: [newAddress] });
+//       } else {
+//           // If the user already has an address, push the new address to the array
+//           userAddress.address.push(newAddress);
+//           // Check if there is only one address in the array
+//           if (userAddress.address.length === 1) {
+//               // If there is only one address, set it as the default
+//               userAddress.address[0].isDefault = true;
+//           }
+//       }
+
+//       await userAddress.save(); // Save the updated address document
+//       console.log(userAddress, 'useraddress');
+
+//       res.redirect('/checkout');
+
+//   } catch (error) {
+//       throw new Error(error.message);
+//   }
+// }
+// //end of pcw
+
+
+
+const deleteAddress= async (req, res) => {
+  try {
+      const id = req.query.id;
+      const userId = req.session.user_id;
+
+      // Find the address with the specified address ID
+      const address = await Address.findOne({ user_id: userId });
+
+      // Find the deleted address and check if it is the default address
+      const deletedAddress = address.addresses.find((addr) => addr._id.toString() === id);
+      console.log(deletedAddress, 'deletedAddress');
+      const isDefaultAddress = deletedAddress && deletedAddress.is_default;
+      console.log(isDefaultAddress, 'isDefaultAddress');
+
+      // Remove the address with the specified ID from the address array
+      address.addresses = address.addresses.filter(addr => addr._id.toString() !== id);
+
+      // If the deleted address was the default address, set the next available address as the new default
+      if (isDefaultAddress && address.addresses.length > 0) {
+          // Find the first non-deleted address and set it as the new default
+          const newDefaultAddress = address.addresses.find(addr => addr._id.toString() !== id);
+          if (newDefaultAddress) {
+              newDefaultAddress.is_default = true;
+          }
+          console.log(newDefaultAddress, 'newDefaultAddress');
+      }
+
+      // Save the updated address
+      await address.save();
+      res.redirect('/address');
+  } catch (error) {
+      throw new Error(error.message);
+  }
+}
+
+
+const editAddress= async (req, res) => {
+  try {
+    
+      const userId = req.session.user_id;
+      const { _id, name, mobile, address, city, state, pincode } = req.body;
+
+      console.log(_id, 'id');
+      console.log(name, 'name');
+      console.log(mobile, 'mobile');
+      console.log(address, 'address');
+      console.log(city, 'city');
+      console.log(state, 'state');
+      console.log(pincode, 'pincode');   
+
+      const updatedAddress = await Address.findOneAndUpdate (
+          {  user_id: userId, 'addresses._id': _id },
+        
+          {
+              $set: {
+                  'addresses.$.name': name,
+                  'addresses.$.mobile': mobile,
+                  'addresses.$.address': address,
+                  'addresses.$.city': city,
+                  'addresses.$.state': state,
+                  'addresses.$.pincode': pincode,
+              }
+          },
+          { new: true }
+      );
+      console.log(address._id,"addid");
+      console.log(userId,_id);
+      console.log(updatedAddress,"updated address.........................................................................................");
+
+      if (updatedAddress) {
+          console.log('Address updated successfully:', updatedAddress);
+          // Redirect or send a response indicating the update was successful
+          res.redirect('/address');
+      } else {
+          console.log('Address not found or not updated');
+          // Redirect or send a response indicating the address was not found or not updated
+          res.redirect('/address');
+      }
+  } catch (error) {
+      console.error('Error updating address:', error);
+      // Handle the error appropriately
+      res.redirect('/address');
+  }
+}
+
+
+
+
+const loadCheckout= async (req, res) => {
+  try {
+      const userId = req.session.user_id;
+      console.log(userId, 'id');
+      // Find the default address for the user
+      const defaultAddress = await Address.findOne({ user_id: userId, 'addresses.is_default': true }, { 'addresses.$': 1 }).lean();
+
+      console.log(defaultAddress, 'default address');
+
+      // Find the user document and extract the address array
+      const userDocument = await Address.findOne({ user_id: userId }).lean();
+      const addressArray = userDocument.addresses;
+      console.log(addressArray, 'addressArray');
+
+      // Filter the addresses where isDefault is false
+      const filteredAddresses = addressArray.filter(address => !address.is_default);
+      console.log(filteredAddresses, 'filteredAddresses');
+
+
+
+      // finding cart products //
+    
+      const cart = await Cart.findOne({ user_id: req.session.user_id })
+          .populate({
+              path: 'products.productId',
+              populate: { path: 'category', select: 'category' },
+          })
+          .lean()
+
+          .exec();
+
+      const products = cart.products.map((product) => {
+          const total =
+              Number(product.quantity) * Number(product.productId.price);
+          return {
+              _id: product.productId._id.toString(),
+              name: product.productId.name,
+              category: product.productId.category.category, // Access the category field directly
+              images: product.productId.images,
+              price: product.productId.price,
+              description: product.productId.description,
+              quantity: product.quantity,
+              total,
+              user_id: req.session.user_id,
+
+          };
+      });
+
+      const total = products.reduce(
+          (sum, product) => sum + Number(product.total),
+          0
+      );
+      const finalAmount = total;
+      // Get the total count of products
+      const totalCount = products.length;
+
+
+      res.render('users/checkout',
+          {
+             
+              defaultAddress: defaultAddress.addresses[0],
+              filteredAddresses: filteredAddresses,
+              products,
+              total,
+              totalCount,
+              subtotal: total,
+              finalAmount,
+          });
+
+
+
+  } catch (error) {
+      throw new Error(error.message);
+  }
+}
+
+
+// const loadCheckout = async (req, res) => {
+//   try {
+
+  
+
+//     const userId = req.session.user_id;
+//     console.log(userId, 'id');
+
+//     // Find the default address for the user
+//     const defaultAddress = await Address.findOne(
+//       { user_id: userId, 'addresses.is_default': true },
+//       { 'addresses.$': 1 }
+//     ).lean();
+
+//     console.log(defaultAddress, 'default address');
+
+//     // Find the user document and extract the address array
+//     const userDocument = await Address.findOne({ user_id: userId }).lean();
+//     const addressArray = userDocument.addresses;
+//     console.log(addressArray, 'addressArray');
+
+//     // Filter the addresses where isDefault is false
+//     const filteredAddresses = addressArray.filter(
+//       (address) => !address.is_default
+//     );
+//     console.log(filteredAddresses, 'filteredAddresses');
+
+//     // Check if there are no addresses
+//     if (!defaultAddress || filteredAddresses.length === 0) {
+//       return res.redirect('/checkout');
+//     }
+
+//     // Finding cart products
+//     const cart = await Cart.findOne({ user_id: req.session.user_id })
+//       .populate({
+//         path: 'products.productId',
+//         populate: { path: 'category', select: 'category' },
+//       })
+//       .lean()
+//       .exec();
+
+//     const products = cart && cart.products ? cart.products.map((product) => {
+//       const total = Number(product.quantity) * Number(product.productId.price);
+//       return {
+//         _id: product.productId._id.toString(),
+//         name: product.productId.name,
+//         category: product.productId.category.category,
+//         images: product.productId.images,
+//         price: product.productId.price,
+//         description: product.productId.description,
+//         quantity: product.quantity,
+//         total,
+//         user_id: req.session.user_id,
+//       };
+//     }) : [];
+
+//     const total = products.reduce((sum, product) => sum + Number(product.total), 0);
+//     const finalAmount = total;
+//     // Get the total count of products
+//     const totalCount = products.length;
+
+//     res.render('users/checkout', {
+//       defaultAddress: defaultAddress.addresses[0],
+//       filteredAddresses: filteredAddresses,
+//       products,
+//       total,
+//       totalCount,
+//       subtotal: total,
+//       finalAmount,
+//     });
+//   } catch (error) {
+//     throw new Error(error.message);
+//   }
+// };
+
+
+
+const changeAddress= async (req, res) => {
+  try {
+
+    console.log("Entered into Change address page.....");
+      const addressId = req.body.addressId;
+      const userId = req.session.user_id;
+
+      // Find the current default address and unset its "isDefault" flag
+      await Address.findOneAndUpdate(
+          { user_id: userId, 'addresses.is_default': true },
+          { $set: { 'addresses.$.is_default': false } }
+      );
+      // console.log(defaultAddress,"old default address");
+
+
+      // Set the selected address as the new default address
+      const defaultAddress = await Address.findOneAndUpdate(
+          { user_id: userId, 'addresses._id': addressId },
+          { $set: { 'addresses.$.is_default': true } }
+      );
+      console.log(defaultAddress,"new Default address");
+
+      res.redirect('/checkout')
+
+
+
+
+
+  } catch (error) {
+      res.status(500).json({ success: false, message: 'Failed to set address as default' });
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+const placeOrder= async (req, res) => {
+  try {
+      const paymentMethod = req.body.paymentMethod;
+      console.log(paymentMethod, 'paymentMethod');
+
+      const userId = req.session.user_id;
+      console.log(userId, 'id from placeOrderMeth');
+
+      const orderStatus = paymentMethod === "COD" ? "Placed" : "Pending";
+      console.log(orderStatus, "orderStatus");
+
+      // Find the default address for the user
+      const defaultAddress = await Address.findOne(
+          { user_id: userId, 'addresses.is_default': true },
+          { 'addresses.$': 1 }
+      ).lean();
+      console.log(defaultAddress, 'default address');
+
+      if (!defaultAddress) {
+          console.log('Default address not found');
+          return res.redirect('/address');
+      }
+
+      const productDetails = await Cart.findOne({ user_id: userId }).lean();
+      console.log(productDetails, 'productDetails');
+
+      // Calculate the new subtotal for all products in the cart
+      const subtotal = productDetails.products.reduce((acc, product) => {
+          return acc + product.total;
+      }, 0);
+
+      console.log(subtotal, 'subtotal');
+
+      const products = productDetails.products.map((product) => ({
+          productId: product.productId,
+          quantity: product.quantity,
+          total: product.total
+      }));
+      const defaultAddressDetails = defaultAddress.addresses[0];
+      const address = {
+          name: defaultAddressDetails.name,
+          mobile: defaultAddressDetails.mobile,
+          address: defaultAddressDetails.address,
+          city: defaultAddressDetails.city,
+          state: defaultAddressDetails.street,
+          pincode: defaultAddressDetails.pincode
+      };
+      console.log(address, 'address');
+
+      const orderDetails = new Order({
+          userId: userId,
+          date: Date(),
+          orderValue: subtotal,
+          paymentMethod: paymentMethod,
+          orderStatus: orderStatus,
+          products: products,
+          addressDetails: address
+      });
+
+      const placedOrder = await orderDetails.save();
+
+      console.log(placedOrder, 'placedOrder');
+
+      // Remove the products from the cart
+      await Cart.deleteMany({ user_id: userId });
+
+      res.render('users/orderPlaced');
+  } catch (error) {
+      console.error(error);
+      res.redirect('/home');
+  }
+}
+
+
+
+const orderDetails= async (req, res) => {
+  try {
+    console.log("entered into order details page..");
+      const userId = req.session.user_id
+      console.log(userId);
+      const orderDetails = await Order.find({ userId: userId }).lean()
+      orderHistory = orderDetails.map(history => {
+          let createdOnIST = moment(history.date)
+              .tz('Asia/kolkata')
+              .format('DD-MM-YYYY h:mm A');
+
+          return { ...history, date: createdOnIST };
+      })
+
+      console.log(orderDetails, 'orderDetails');
+
+      res.render('users/ordersList', {  orderDetails: orderHistory });
+
+
+  } catch (error) {
+      throw new Error(error.message);
+  }
+}
+
+
+
+
+const loadOrdersView = async (req, res) => {
+  try {
+      const orderId = req.query.id;
+      
+      const userId = req.session.user_id
+
+      console.log(orderId, 'orderId when loading page');
+      const order = await Order.findOne({ _id: orderId })
+          .populate({
+              path: 'products.productId',
+              select: 'productname price images',
+          })
+
+
+      const createdOnIST = moment(order.date).tz('Asia/Kolkata').format('DD-MM-YYYY h:mm A');
+      order.date = createdOnIST;
+
+      const orderDetails = order.products.map(product => {
+          const images = product.productId.images || []; // Set images to an empty array if it is undefined
+          const image = images.length > 0 ? images[0] : ''; // Take the first image from the array if it exists
+
+          return {
+              name: product.productId.productname,
+              image: images,
+              price: product.productId.price,
+              total: product.total,
+              quantity: product.quantity,
+              status : order.orderStatus,
+             
+          };
+      });
+      
+
+      const deliveryAddress = {
+        name: order.addressDetails.name,
+        address: order.addressDetails.address,
+        city: order.addressDetails.city,
+        state: order.addressDetails.state,
+        pincode: order.addressDetails.pincode,
+    };
+
+    const subtotal = order.orderValue;
+    // const cancellationStatus = order.cancellationStatus
+    // console.log(cancellationStatus,'cancellationStatus');
+   
+    console.log(subtotal, 'subtotal');
+    
+
+    console.log(orderDetails, 'orderDetails');
+    console.log(deliveryAddress, 'deliveryAddress');
+
+    res.render('users/ordersView', {
+        orderDetails: orderDetails,
+        deliveryAddress: deliveryAddress,
+        subtotal: subtotal,
+       
+        orderId: orderId,
+        orderDate: createdOnIST,
+        // cancellationStatus:cancellationStatus,
+       
+    });
+} catch (error) {
+    throw new Error(error);
+}
+}
+ 
+
+
 
 module.exports={
   loadSignup,
@@ -624,14 +1444,8 @@ module.exports={
   resetPassword,
   
 
-
- 
-    profilePage,
-    editProfile,
-      updateProfile,
-
    singleProductDetails,
-   checkoutPage,
+  //  checkoutPage,
 
    getOtp,
   sendOtp,
@@ -644,6 +1458,25 @@ module.exports={
   getCart,
    addToCart,
   changeQuantity,
+  deleteProduct,
+  blockUser,
+
+
+  profilePage,
+  editUser,
+  
+  loadAddress,
+  addAddress,
  
+  setAsDefault,
+  deleteAddress,
+  editAddress,
+  // addNewAddress,
+ loadCheckout,
+ changeAddress,
+
+ placeOrder,
+ orderDetails,
+ loadOrdersView,
 }
 
