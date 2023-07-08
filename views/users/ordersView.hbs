@@ -225,22 +225,16 @@
 
 
                                             <li class="nav-item active"><a class="nav-link" href="/home"> Home</a></li>
-                                            <li class="nav-item dropdown">
-                                                <a class="nav-link dropdown-toggle" href="#" id="karlDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Pages</a>
-                                                <div class="dropdown-menu" aria-labelledby="karlDropdown">
-                                                    
-                                                    <a class="dropdown-item" href="shop.html">Shop</a>
-                                                    <a class="dropdown-item" href="product-details.html">Product Details</a>
-                                                    <a class="dropdown-item" href="/cart">Cart</a>
-                                                    <a class="dropdown-item" href="checkout.html">Checkout</a>
-                                                </div>
-                                            </li>
-                                            <li class="nav-item"><a class="nav-link" href="/checkout">Checkout</a></li>
-                                            {{!-- <span class="karl-level">hot</span> --}}
-                                            <li class="nav-item"><a class="nav-link" href="/profile">Profile</a></li>
+                                           
+                                           
+                                            <li class="nav-item active"><a class="nav-link" href="#"> Mobiles</a></li>
+
+                                            <li class="nav-item active"><a class="nav-link" href="#"> Laptops</a></li>
+
+                                            <li class="nav-item"><a class="nav-link" href="/order-details">Orders</a></li>
                                              <li class="nav-item active"><a class="nav-link" href="/cart">Cart<i class="ti-bag"></i> </a>
                                              
-                                               <a href="#" id="header-cart-btn" target="_blank"> <i class="ti-bag"></i> </a>
+                                                <li class="nav-item"><a class="nav-link" href="/profile">Profile</a></li>
                                              
                                              
                                              </li>
@@ -385,7 +379,7 @@
                 </div>
             </div>
             {{/each}}
-            {{!-- <div class="row justify-content-end mt-3">
+            <div class="row justify-content-end mt-3">
                 <div class="col-auto">
                     {{#if (eq cancellationStatus "Not requested")}}
                    
@@ -399,7 +393,7 @@
 
                     {{/if}}
                 </div>
-            </div> --}}
+            </div>
 
             <div class="row mt-4">
                 <div class="col">
@@ -452,7 +446,7 @@
             <div class="jumbotron-fluid">
                 <div class="row justify-content-between">
                     <div class="col-auto my-auto">
-                        <h2 class="mb-0 font-weight-bold">TOTAL PAID</h2>
+                        <h2 class="mb-0 font-weight-bold">Total Amount :</h2>
                     </div>
                     <div class="col-auto my-auto ml-auto">
                         <h1 class="display-3">&#8377;{{subtotal}}</h1>
@@ -462,6 +456,8 @@
         </div>
     </div>
 </div>
+
+
 <!-- Modal -->
 <div class="modal" id="cancelConfirmationModal" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
@@ -477,7 +473,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
-                 <form action="" method="">
+                 <form action="/cancel-order" method="post">
                 <button type="submit" class="btn btn-danger" id="confirmCancelBtn" name="orderId" value="{{orderId}}">Yes, Cancel</button>
                 </form>
             </div>

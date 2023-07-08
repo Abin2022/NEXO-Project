@@ -168,7 +168,11 @@
 
 
                                             <li class="nav-item active"><a class="nav-link" href="/home"> Home</a></li>
-                                            <li class="nav-item dropdown">
+                                         <li class="nav-item active"><a class="nav-link" href="#"> Mobiles</a></li>
+
+                                            <li class="nav-item active"><a class="nav-link" href="#">Laptops</a></li>
+
+                                            {{!-- <li class="nav-item dropdown">
                                                 <a class="nav-link dropdown-toggle" href="#" id="karlDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Pages</a>
                                                 <div class="dropdown-menu" aria-labelledby="karlDropdown">
                                                     
@@ -177,11 +181,12 @@
                                                     <a class="dropdown-item" href="/cart">Cart</a>
                                                     <a class="dropdown-item" href="checkout.html">Checkout</a>
                                                 </div>
-                                            </li>
-                                            <li class="nav-item"><a class="nav-link" href="/checkout">Checkout</a></li>
+                                            </li> --}}
+                                            <li class="nav-item"><a class="nav-link" href="/order-details">Orders</a></li>
                                             {{!-- <span class="karl-level">hot</span> --}}
+                                                 <li class="nav-item active"><a class="nav-link" href="/cart">Cart<i class="ti-bag"></i> </a>
+
                                             <li class="nav-item"><a class="nav-link" href="/profile">Profile</a></li>
-                                             <li class="nav-item active"><a class="nav-link" href="/cart">Cart<i class="ti-bag"></i> </a>
                                              
                                                <a href="#" id="header-cart-btn" target="_blank"> <i class="ti-bag"></i> </a>
                                              
@@ -253,7 +258,7 @@
                         <span class="text-muted">Your cart</span>
                         <span class="badge badge-secondary badge-pill">{{this.totalCount}}</span>
                     </h4>
-                    <ul class="list-group mb-3 sticky-top">
+                    <ul class="list-group mb-3 ">
                         {{#each products}}
                         <li class="list-group-item d-flex justify-content-between lh-condensed">
                             <div>
@@ -290,8 +295,7 @@
                     </form>
                 </div>
                 {{/if}}
-
-
+  
 
 
                 
@@ -347,14 +351,30 @@
                         </div>
                         <hr class="mb-4">
                         <div class="row">
-                            <div class="col-md-6 mb-3">
+                            <div class="col-md-3 mb-3">
                                 <button class="btn btn-dark btn-lg btn-block" data-toggle="modal"
                                     data-target="#changeaddress" type="button">Change Address</button>
                             </div>
-                            <div class="col-md-6 mb-3">
+                            <div class="col-md-3 mb-3">
                                 <button class="btn btn-dark btn-lg btn-block" data-toggle="modal"
                                     data-target="#addnewaddress" type="button">Add new Address</button>
                             </div>
+                             {{!-- <div class="col-md-3 mb-3">
+                                <button class="btn btn-dark btn-lg btn-block" data-toggle="modal"
+                                    data-target="editingAddress" type="button">Edit Address</button>
+                            </div> --}}
+                            <div class="col-md-3 mb-3">
+  <a href="/address" class="btn btn-dark btn-lg btn-block" data-toggle="modal" data-target="#editingAddress">Edit Address</a>
+</div>
+                                            <div class="col-md-3 mb-3">
+  <a href="/delete-address?id={{this._id}}" class="btn btn-dark btn-lg btn-block"  onclick="return confirm('Are you sure you want to delete this Address?')">Delete Address</a>
+</div>
+ </button>
+             
+                             {{!-- <div class="col-md-3 mb-3">
+                                <button class="btn btn-dark btn-lg btn-block" data-toggle="modal"
+                                    data-target="#addnewaddress" type="button">Delete Address</button>
+                            </div> --}}
                         </div>
 
                         <hr class="mb-4">
@@ -362,7 +382,7 @@
                         <div class="d-block my-3">
                             <div class="custom-control custom-radio">
                                 <input id="credit" name="paymentMethod" type="radio" class="custom-control-input"
-                                    checked="" required="" style="color: #343a40;">
+                                    checked="" required="" value="COD" style="color: #343a40;">
                                 <label class="custom-control-label" for="credit">COD</label>
                             </div>
                             {{!-- <div class="custom-control custom-radio">
@@ -383,6 +403,12 @@
                             checkout</button>
                             
                     </form>
+                    <div class="message" style="color: red; text-align: center;">
+  {{#if message}}
+  {{message}}
+  {{/if}}
+</div>
+
                 </div>
                
             </div>
@@ -506,6 +532,54 @@
 </div>
 
 {{!-- footer --}}
+
+<!--Edit address Modal -->
+<div class="modal fade" id="editingAddress" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle"
+  aria-hidden="true" style="color: #343a40;">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLongTitle">Edit address detailed</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form action="/edit-address" method="post">
+          <div class="form-group">
+            <label for="edit-username">Name</label>
+            <input type="text" class="form-control" name="name" id="edit-username" value="{{this.name}}" required>
+          </div>
+          <div class="form-group">
+            <label for="edit-email">Mobile</label>
+            <input type="text" class="form-control" name="mobile" id="edit-email" value="{{this.mobile}}" required>
+          </div>
+          <div class="form-group">
+            <label for="edit-phone">Address</label>
+            <input type="text" class="form-control" name="address" id="edit-phone" value="{{this.address}}" required>
+          </div>
+          <div class="form-group">
+            <label for="edit-email">City</label>
+            <input type="text" class="form-control" name="city" id="edit-email" value="{{this.city}}" required>
+          </div>
+          <div class="form-group">
+            <label for="edit-email">State</label>
+            <input type="text" class="form-control" name="state" id="edit-email" value="{{this.state}}" required>
+          </div>
+          <div class="form-group">
+            <label for="edit-email">Postal code</label>
+            <input type="number" class="form-control" name="pincode" id="edit-email" value="{{this.pincode}}" required>
+          </div>
+          <input type="hidden" class="form-control" name="_id" id="edit-_id">
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary add-button">Edit</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
 
 
     

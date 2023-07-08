@@ -26,13 +26,13 @@ const ordersSchema = new mongoose.Schema({
   products: [
     {
       productId: {
-        type: mongoose.Schema.Types.ObjectId, // The type of the product field (e.g., String, ObjectId, etc.)
+        type: mongoose.Schema.Types.ObjectId,
         ref:"Product"
       },
       quantity: {
         type: Number,
         required: true,
-        default: 1 // You can set a default value if needed
+        default: 1
       },
       total:{
         type:Number,
@@ -41,8 +41,6 @@ const ordersSchema = new mongoose.Schema({
     }
   ],
   addressDetails: {
-
-  
     
       name: {
         type:String,

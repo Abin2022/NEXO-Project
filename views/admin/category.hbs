@@ -66,7 +66,7 @@
                     </div>
                 </div>
                 <div class="navbar-nav w-100">
-                    <a href="index.html" class="nav-item nav-link active"><i class="fa fa-tachometer-alt me-2"></i>Dashboard</a>
+                    <a href="index.html" class="nav-item nav-link "><i class="fa fa-tachometer-alt me-2"></i>Dashboard</a>
 
 
                     {{!-- <div class="nav-item dropdown">
@@ -78,9 +78,13 @@
                         </div>
                     </div> --}}
 
-                    <a href="/admin/category" class="nav-item nav-link"><i class="fa fa-th me-2"></i>CATEGORY</a>
-                    <a href="/admin/add-products" class="nav-item nav-link"><i class="fa fa-keyboard me-2"></i>Products</a>
-                    <a href="/admin/user" class="nav-item nav-link"><i class="fa fa-table me-2"></i>USERS</a>
+                 
+                    <a href="/admin/category" class="nav-item nav-link active" ><i class="fa fa-folder"></i>CATEGORY</a>
+                    <a href="/admin/add-products" class="nav-item nav-link"><i class="fa fa-cube"></i>Products</a>
+                    <a href="/admin/user" class="nav-item nav-link"><i class="fa fa-user"></i>USERS</a>  
+                       <a href="/admin/orders" class="nav-item nav-link"><i class="fa fa-shopping-cart me-2"></i>ORDERS</a>
+                                                 <a href="/admin/manage-coupons" class="nav-item nav-link"><i class="fas fa-tags"></i>COUPONS</a>
+
                     {{!-- <a href="chart.html" class="nav-item nav-link"><i class="fa fa-chart-bar me-2"></i>Charts</a> --}}
                     <div class="nav-item dropdown">
                         <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"><i class="far fa-file-alt me-2"></i>Pages</a>
@@ -196,7 +200,6 @@
     }
 </style>
 {{>admin-layout}} --}}
-
 <div class="container-fluid pt-4">
     <div class="row">
         <div class="col-md-12">
@@ -205,6 +208,10 @@
                     data-bs-target="#exampleModalCenter">
                     Add Category
                 </button>
+                {{!-- <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                    data-bs-target="#editModal">
+                    Edit
+                </button> --}}
             </div>
 
             <div class="bg-light rounded p-4">
@@ -220,7 +227,7 @@
                                 <th scope="col">SL NO</th>
                                 <th scope="col">ID</th>
                                 <th scope="col">CATEGORY</th>
-                                <th scope="col">Edit</th>
+                                <th scope="col">OPTIONS</th>
                                 
                             </tr>
                         </thead>
@@ -230,7 +237,11 @@
                                 <th class="align-middle" scope="row">{{serialNumber}}</th>
                                 <td class="align-middle">{{_id}}</td>
                                 <td class="align-middle">{{category}}</td>
-                                <td class="align-middle">{{edit}}</td>
+                                <td class="align-middle">{{edit}}
+                                <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                    data-bs-target="#editModal">
+                    Edit
+                </button></td>
                             </tr>
                             {{/each}}
                         </tbody>
@@ -282,8 +293,35 @@
     </div>
 </div>
 
-{{!-- {{>admin-footer}} --}}
-
+<!-- Edit Modal -->
+<div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalTitle"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editModalLongTitle">Edit Category</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form action="/admin/edit-category" method="post">
+                <div class="modal-body">
+                    <div class="row mb-3">
+                        <label for="editInputEmail3" class="col-sm-2 col-form-label">Category</label>
+                        <div class="col-sm-10">
+                            <input type="text" name="category" class="form-control" id="editInputEmail3" value="{{this.category}}" required>
+                        </div>
+                    </div>
+                    <input type="hidden" name="id" value="{{this._id}}">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Update</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
 
 

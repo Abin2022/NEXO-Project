@@ -86,65 +86,18 @@
                                          <li class="nav-item active"> <a href="#"><img src="img/core-img/logo.png" alt=""  ></a></li>
 
 
-
-                            
-                                         
-
-
                                             <li class="nav-item active"><a class="nav-link" href="/home"> Home</a></li>
-                                            {{!-- <li class="nav-item dropdown">
-                                                <a class="nav-link dropdown-toggle" href="#" id="karlDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Category</a>
-                                                <div class="dropdown-menu" aria-labelledby="karlDropdown">
-                                                    
-                                                    <a class="dropdown-item" href="shop.html">Shop</a>
-                                                    <a class="dropdown-item" href="product-details.html">Product Details</a>
-                                                    <a class="dropdown-item" href="/cart">Cart</a>
-                                                    <a class="dropdown-item" href="checkout.html">Checkout</a>
-                                                </div>
-                                            </li> --}}
-
-
-
-                                            {{!-- <select name="category"> {{#each categories}} <option value="{{this}}">{{this}}</option>{{/each}}</select> --}}
-
-
-
-
-
-
-
-
                                             
                                            <li class="nav-item active"><a class="nav-link"   href="#">Mobiles</a></li>
                                            <li class="nav-item active"><a class="nav-link" href="#"> Laptops</a></li>
+                                           <li class="nav-item active"><a class="nav-link"   href="/shop">SHOP</a></li>
                                              <li class="nav-item active"><a class="nav-link"   href="/order-details">Orders</a></li>
 
-                                           {{!-- <li class="nav-item active"><a class="nav-link" href="/checkout"> Checkout</a></li> --}}
-                                              {{!-- <a class="dropdown-item" href="checkout.html">Checkout</a> --}}
-
-                                            {{!-- <li class="nav-item"><a class="nav-link" href="#">Products</a></li> --}}
-                                            {{!-- <span class="karl-level">hot</span> --}}
-                                             
-                                            {{!-- <li class="nav-item"><a class="nav-link" href="#">Contact</a></li> --}}
-                                             {{!-- <li class="nav-item active"><a class="nav-link" href="/cart">Cart  <i class="ti-bag"></i></i>    </a> --}}
-
-                                            {{!-- <li> <a href="#" id="header-cart-btn" target="_blank"><span class="cart_quantity"></span> <i class="ti-bag"></i></a></li> --}}
-                                            
-                                        {{!-- <a href="#" id="header-cart-btn" target="_blank"><span class="cart_quantity">2</span> <i class="ti-bag"></i> Your Bag $20</a> --}}
-                                        
 
                                              
                                             <li class="nav-item active">  <a class="nav-link"  href="/cart">Cart<i class="ti-bag"></i> </a></li>
                                             
                                             <li class="nav-item"><a class="nav-link" href="/profile">Profile</a></li> 
-
-                                             
-                                               
-                                             
-                                            
-                                             {{!-- <li class="nav-item"><a class="nav-link" href="#">Whishlist</a></li>
-                                             <li class="nav-item"><a class="nav-link" href="#">Account</a></li> 
-                                            <li class="nav-item"><a class="nav-link" href="/about">About</a></li> --}}
                                         </ul>
                                     </div>
                                 </nav>
@@ -165,20 +118,6 @@
             
         </header>
         <!-- ****** Header Area End ****** -->
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         
 
         <!-- ****** Top Discount Area Start ****** -->
@@ -223,66 +162,86 @@
                 </div>
             </div>
         </section>
-     
-
- <!-- ****** New Arrivals Area Start ****** -->
-<section class="new_arrivals_area section_padding_100_0 clearfix">
+   <section class="new_arrivals_area section_padding_100_0 clearfix">
     <div class="container">
         <div class="row">
             <div class="col-12">
                 <div class="section_heading text-center">
-                    <h2>New Products</h2>
+                    <h2> Laptop </h2>
                 </div>
             </div>
         </div>
     </div>
 
     <div class="container">
-        
         <div class="row karl-new-arrivals">
             {{#each Product}}
-            {{!-- {{#if (eq this.category 'MOBILE')}} --}}
-          
+            {{#if (eq this.category 'LAPTOP')}}
             <!-- Single gallery Item Start -->
             <div class="col-12 col-sm-6 col-md-4 single_gallery_item women wow fadeInUpBig" data-wow-delay="0.2s">
                 <!-- Product Image -->
                 <div class="product-img">
-
-                   
-                      <a href="/product-details?id={{this._id}}">  <img src="/uploads/{{images.[0]}}" alt="Image" >
-                      </a>
-                      
-
+                    <a href="/product-details?id={{this._id}}">
+                        <img src="/uploads/{{images.[0]}}" alt="Image">
+                    </a>
                     <div class="product-quicview">
                         <a href="/product-details?id={{this._id}}" data-toggle="modal" data-target="#quickview"><i class="ti-plus"></i></a>
                     </div>
                 </div>
                 <!-- Product Description -->
                 <div class="product-description">
-                    {{!-- <h3 class="product-price">{{this.brand}}</h3> --}}
                     <h6>{{this.productname}}</h6>
-                  
-
-                    <h6>Price:₹{{this.price}}</h6>
-                      
-                    <!-- Add to Cart -->
-                    
-                  <a href="#" class="add-to-cart-btn" onclick="addToCart('{{this._id}}',event), showSweetAlert()">Add to cart</a>
-
-                    {{!-- <a href="/cart" class="add-to-cart-btn">ADD TO CART</a> --}}
-                    {{!-- <a href="/product-details?id={{this._id}}">   <img src="/uploads/{{images.[0]}}" alt="Image" width="400px" height="400px"> --}}
-                      </a>
+                    <h6>Price: ₹{{this.price}}</h6>
+                    <a href="#" class="add-to-cart-btn" onclick="addToCart('{{this._id}}',event), showSweetAlert()">Add to cart</a>
                 </div>
             </div>
-            {{!-- {{/if}} --}}
+        
+            {{/if}}
             {{/each}}
-        </div>   
+        </div>
     </div>
-   
-
-
-    
 </section>
+
+<section class="new_arrivals_area section_padding_100_0 clearfix">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="section_heading text-center">
+                    <h2>Mobile </h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="row karl-new-arrivals">
+            {{#each Product}}
+            {{#if (eq this.category 'MOBILE')}}
+            <!-- Single gallery Item Start -->
+            <div class="col-12 col-sm-6 col-md-4 single_gallery_item women wow fadeInUpBig" data-wow-delay="0.2s">
+                <!-- Product Image -->
+                <div class="product-img">
+                    <a href="/product-details?id={{this._id}}">
+                        <img src="/uploads/{{images.[0]}}" alt="Image">
+                    </a>
+                    <div class="product-quicview">
+                        <a href="/product-details?id={{this._id}}" data-toggle="modal" data-target="#quickview"><i class="ti-plus"></i></a>
+                    </div>
+                </div>
+                <!-- Product Description -->
+                <div class="product-description">
+                    <h6>{{this.productname}}</h6>
+                    <h6>Price: ₹{{this.price}}</h6>
+                    <a href="#" class="add-to-cart-btn" onclick="addToCart('{{this._id}}',event), showSweetAlert()">Add to cart</a>
+                </div>
+            </div>
+
+            {{/if}}
+            {{/each}}
+        </div>
+    </div>
+</section>
+
 
 {{!-- <section>
       <div class="container">
@@ -400,14 +359,6 @@ function showSweetAlert() {
                             </div> --}}
                         </div>
                     </div>
-
-
-
-
-
-
-
-
                     <!-- Single Footer Area Start -->
                     <div class="col-12 col-sm-6 col-md-3 col-lg-2">
                         <div class="single_footer_area">
@@ -451,22 +402,7 @@ function showSweetAlert() {
                     </div>
                 </div>
                 <div class="line"></div>
-                
-
-
-
-                
-    </div>
-
-
-
-
-
-
-       
- 
-
-
+               </div>
 
  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
    <!-- add to cart popup -->

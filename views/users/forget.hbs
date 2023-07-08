@@ -19,9 +19,14 @@
   <button>Get password link</button>
   <p>
   
-    <b onclick="toggle()" class="pointer"><a href="/">Back to Login Page</a></b>
+    <b onclick="toggle()" class="pointer"  ><a href="/">Back to Login Page</a></b>
   </p>
 </form>
+<div class="message" style="color: red; text-align: center;">
+  {{#if message}}
+  {{message}}
+  {{/if}}
+</div>
 
 					</div>
 				</div>

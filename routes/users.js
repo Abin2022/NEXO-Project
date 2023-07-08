@@ -24,6 +24,7 @@ const userUpload = multer ({storage: storage})
 
 router.get('/signup',auth.isLogout,userControllers.loadSignup)
 router.post('/signup',userControllers.insertUser)
+router.get('/emailVerificationNotation',userControllers.mailNotification)
 router.get('/verify',userControllers.verifyMail)
 
 router.get('/',auth.isLogout,userControllers.loginLoad)
@@ -36,12 +37,18 @@ router.get('/logout',auth.isLogin,userControllers.userLogout)
 router.get('/forget',auth.isLogout,userControllers.forgetLoad)
 router.post('/forget',userControllers.forgetVerify)
 
+router.get('/forgetPassPage',auth.isLogout,userControllers.notifyForPassReset)
 router.get('/forget-password',auth.isLogout,userControllers.forgetPasswordLoad)
 router.post('/forget-password',auth.isLogout,userControllers.resetPassword)
 
 router.get('/otp',userControllers.getOtp)
-router.get('/sendOtp',userControllers.sendOtp)
+router.post('/sendOtp',userControllers.sendOtp)
 router.post('/verifyOtp',userControllers.verifyOtp)
+
+
+
+// router.get('/mobile',auth.isLogin,userControllers.mobilePage)
+
 
  router.get('/product-details',auth.isLogin,userControllers.singleProductDetails)
 
@@ -63,9 +70,7 @@ router.post('/edit-address',userControllers.editAddress);
  router.post('/place-order',userControllers.placeOrder)
  router.get('/order-details',auth.isLogin,userControllers.orderDetails)
   router.get('/ordersView',auth.isLogin,userControllers.loadOrdersView)
-
-
-  
+   router.post('/cancel-order',userControllers.cancelOrder)
 
 
  router.post('/addtocart',auth.isLogin,userControllers.addToCart)
@@ -73,12 +78,11 @@ router.get('/cart',auth.isLogin,userControllers.getCart)
 router.post('/change-product-quantity',userControllers.changeQuantity)
 // router.post('/delete-product-from-cart',userControllers.deleteProduct)
 
-
-
 // router.get('/checkout',auth.isLogin,userControllers.checkoutPage)
 
 
 router.get('/block',userControllers.blockUser)
+router.get('/shop',auth.isLogin,userControllers.loadShopPage)
 
 
 module.exports=router

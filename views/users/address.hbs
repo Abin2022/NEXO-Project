@@ -235,6 +235,8 @@
                                             
                                            <li class="nav-item active"><a class="nav-link" href="#">Mobiles</a></li>
                                            <li class="nav-item active"><a class="nav-link" href="#"> Laptops</a></li>
+                                           <li class="nav-item active"><a class="nav-link" href="order-details"> Orders</a></li>
+
 
                                             {{!-- <li class="nav-item"><a class="nav-link" href="#">Products</a></li> --}}
                                             {{!-- <span class="karl-level">hot</span> --}}
@@ -246,7 +248,7 @@
 
                                              
                                             <li class="nav-item active">  <a class="nav-link" href="/cart">Cart <i class="ti-bag"></i></a></li>
-                                            <li class="nav-item"><a class="nav-link" href="/checkout">Checkout</a></li> 
+                                            {{!-- <li class="nav-item"><a class="nav-link" href="/checkout">Checkout</a></li>  --}}
 
 
                                             <li class="nav-item"><a class="nav-link" href="/profile">Profile</a></li> 
@@ -313,6 +315,11 @@
         </section>
 
 <body>
+<div class="message" style="color: red; text-align: center;">
+  {{#if message}}
+  {{message}}
+  {{/if}}
+</div>
 
 
 
@@ -489,7 +496,7 @@
 </div>
 {{else}}
 <section class="cart-section">
-  <section class="h-100 h-custom" style="background-color: #d2c9ff;">
+  <section class="h-100 h-custom" style="background-color: #343a40;">
     <div class="container py-5 h-100">
       <div class="row d-flex justify-content-center align-items-center h-100">
         <div class="col-12">

@@ -1,4 +1,18 @@
 	<link rel="stylesheet" href="/stylesheets/forget.css">  
+            <style>
+  
+  .otp-container{
+     display: flex;
+      justify-content: center;
+      align-items: center;
+      
+  }
+  .otp-logo{
+    display: block;
+      margin: 0 auto;
+      max-height: 81px;
+  }
+ </style>
     
 
 		<div class="row">
@@ -17,9 +31,14 @@
   </div>
 
  <a href="#">
-  <button type="submit" >Submit</button>
+  <button type="submit" value="Verify OTP" >Submit</button>
 </a>
 
+
+           {{#if message}}
+                <p><span style="font-family: Arial, sans-serif; color: green; display:inline-block">{{message}}</span></p>
+
+          {{/if}}
     
      </form>
         <p>

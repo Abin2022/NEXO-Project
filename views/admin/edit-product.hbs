@@ -79,7 +79,7 @@
                     </div>
                 </div>
                 <div class="navbar-nav w-100">
-                    <a href="/admin/home" class="nav-item nav-link active"><i class="fa fa-tachometer-alt me-2"></i>Dashboard</a>
+                    <a href="/admin/home" class="nav-item nav-link "><i class="fa fa-tachometer-alt me-2"></i>Dashboard</a>
 
 
                     {{!-- <div class="nav-item dropdown">
@@ -91,9 +91,10 @@
                         </div>
                     </div> --}}
 
-                    <a href="/admin/category" class="nav-item nav-link"><i class="fa fa-th me-2"></i>CATEGORY</a>
-                    <a href="/admin/add-products" class="nav-item nav-link"><i class="fa fa-keyboard me-2"></i>Products</a>
-                    <a href="/admin/user" class="nav-item nav-link"><i class="fa fa-table me-2"></i>USERS</a>
+                    <a href="/admin/category" class="nav-item nav-link"><i class="fa fa-folder"></i>CATEGORY</a>
+                    <a href="/admin/add-products" class="nav-item nav-link active"><i class="fa fa-cube"></i>Products</a>
+                    <a href="/admin/user" class="nav-item nav-link"><i class="fa fa-user"></i>USERS</a>  
+                       <a href="/admin/orders" class="nav-item nav-link"><i class="fa fa-shopping-cart me-2"></i>ORDERS</a>
                     {{!-- <a href="chart.html" class="nav-item nav-link"><i class="fa fa-chart-bar me-2"></i>Charts</a> --}}
                     <div class="nav-item dropdown">
                         <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"><i class="far fa-file-alt me-2"></i>Pages</a>
@@ -207,75 +208,93 @@
 <div class="container">
    
             
-
+ <br>
         <form action="/admin/edit-product" method="post">
             <h2 class="mb-3">Edit Product</h2>
+           
            
             <div class="mb-3">
                 <label for="name" class="form-label">Brand</label>
                 <input type="String" name="brand" class="form-control" value="{{product.brand}}" required>
             </div>
+            
             <div class="mb-3">
                 <label for="email" class="form-label">Product Name</label>
                 <input type="String" name="productname" class="form-control" value="{{product.productname}}" required>
             </div>
-               
-              {{!-- <div class="mb-3">
+          
+
+                     <div class="mb-3">
                          <label for="category" class="form-label">Category</label>
-                         <select name="category" class="form-control" required>
-                            <option selected>{{product.category}}</option> 
-                            {{#each categories}}                              
-                              <option value="{{this.category}}">{{this.category}}</option> 
-                            {{/each}}
-                           
-                        </select>
-                    </div> --}}
-                    <div class="col-sm-10">
-                            <select name="category" class="form-control"  required>
-                                <option selected>{{product.category}}</option>
-                                {{#each categories}}
-                                <option value="{{this.category}}">{{this.category}}</option>
-                                {{/each}}
-                            </select>
-                        </div>
-                    {{!-- <div class="mb-3">
-    <label for="category" class="form-label">CATEGORY</label>
+                     <div class="col-sm-10">
     <select name="category" class="form-control" required>
         {{#each categories}}
-        <option value="{{this._id}}" {{#if (isEqual this._id product.category)}}selected{{/if}}>
+        <option value="{{this.category}}" 
+        {{#if this.category}} 
+        {{/if}}>
             {{this.category}}
         </option>
         {{/each}}
     </select>
-</div> --}}
+
+    
+</div>
+
+
+
+
+<br>
+
+    
 
 
             <div class="mb-3">
                 <label for="email" class="form-label">Price</label>
                 <input type="Number" name="price" class="form-control" value="{{product.price}}" required>
             </div>
-            {{!-- <div class="mb-3">
+{{!--         
+            <div class="mb-3">
                 <label for="image" class="form-label">Image</label>
+                {{#each product.images}}
+                        <img src="/uploads/{{this}}" alt="" style="width: 200px;height: 180px;" class="image-preview">
+                       <a href="#" class="delete-image" data-index="{{@index}}"><i class="bi bi-trash"></i></a>
+
+              {{/each}}
                 <input type="file" name=" image" class="form-control" value="{{product.image}}"  multiple required>
-            </div> --}}
+            </div>  --}}
 
-             {{!-- {{#each product.images}}
-                            <img src="/uploads/{{this}}" alt="" style="width: 50px;height: 50px;"
-                                class="imagepreview">
-                            <a href="" class="delete-image" data-image="{{this}}" data-index="{{@index}}"><i
-                                class="bi bi-x-lg"></i></a> 
-                            {{/each}}
-            <div class="mb-3"> --}}
 
-                <div class="mb-3">
+            {{!-- {{#each product.images}}
+    <div class="image-container">
+        <img src="/uploads/{{this}}" alt="" style="width: 200px;height: 180px;" class="image-preview">
+        <div class="image-actions">
+            <a href="#" class="delete-image" data-index="{{@index}}"><i class="bi bi-trash"></i></a>
+        </div>
+    </div>
+{{/each}} --}}
+
+<div class="mb-3">
     <label for="image" class="form-label">Image</label>
-    <input type="file" name="image" class="form-control" value="{{product.image}}" multiple required>
+    <div class="image-container">
+        {{#each product.images}}
+        <div class="image-item">
+            <img src="/uploads/{{this}}" alt="" style="width: 200px;height: 180px;" class="image-preview">
+            <a href="#" class="delete-image" data-index="{{@index}}"><i class="bi bi-trash"></i></a>
+        </div>
+        {{/each}}
+    </div>
+    <input type="file" name="image" class="form-control" style="display: none;" multiple>
+    <button type="button" class="btn btn-primary add-images-btn">Add Images</button>
 </div>
 
-{{#each product.images}}
-    <img src="/uploads/{{this}}" alt="" style="width: 50px;height: 50px;" class="imagepreview">
-    <a href="" class="delete-image" data-image="{{this}}" data-index="{{@index}}"><i class="bi bi-x-lg"></i></a> 
-{{/each}}
+
+
+
+
+             
+
+
+
 <br>
 <br>
                <div>
@@ -300,6 +319,8 @@
             
 
             <input type="hidden" name="id" value="{{product._id}}">
+            <br>
+        
 
             <div class="mb-3">
                 <button type="submit" class="btn btn-primary">Update</button>
@@ -314,8 +335,68 @@
     </div>
 
 
-    
+  <script>
+    // Function to handle image deletion
+    function deleteImage(index) {
+        // Remove the image from the product.images array
+        product.images.splice(index, 1);
 
+        // Update the image container in the DOM
+        var imageContainer = document.getElementsByClassName('image-container')[0];
+        var imageItem = imageContainer.getElementsByClassName('image-item')[index];
+        imageItem.remove();
+    }
+
+    // Event listener for delete image button
+    var deleteButtons = document.getElementsByClassName('delete-image');
+    for (var i = 0; i < deleteButtons.length; i++) {
+        deleteButtons[i].addEventListener('click', function(event) {
+            event.preventDefault();
+            var index = this.getAttribute('data-index');
+            deleteImage(index);
+        });
+    }
+
+    // Event listener for add images button
+    var addImagesBtn = document.querySelector('.add-images-btn');
+    addImagesBtn.addEventListener('click', function() {
+        var fileInput = document.querySelector('input[type="file"]');
+        fileInput.click();
+    });
+
+    // Event listener for file input change
+    var fileInput = document.querySelector('input[type="file"]');
+    fileInput.addEventListener('change', function(event) {
+        var files = event.target.files;
+        var imageContainer = document.getElementsByClassName('image-container')[0];
+
+        // Display the selected images
+        for (var i = 0; i < files.length; i++) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                var imageItem = document.createElement('div');
+                imageItem.classList.add('image-item');
+                var image = document.createElement('img');
+                image.src = e.target.result;
+                image.alt = 'Image Preview';
+                image.style.width = '200px';
+                image.style.height = '180px';
+                image.classList.add('image-preview');
+                var deleteButton = document.createElement('a');
+                deleteButton.href = '#';
+                deleteButton.classList.add('delete-image');
+                deleteButton.setAttribute('data-index', i);
+                var deleteIcon = document.createElement('i');
+                deleteIcon.classList.add('bi', 'bi-trash');
+                deleteButton.appendChild(deleteIcon);
+                imageItem.appendChild(image);
+                imageItem.appendChild(deleteButton);
+                imageContainer.appendChild(imageItem);
+            };
+            reader.readAsDataURL(files[i]);
+        }
+    });
+</script>
  
 
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>

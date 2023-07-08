@@ -6,11 +6,15 @@ var logger = require('morgan');
 var session =require('express-session')
 const bodyParser=require('body-parser')
 const hbs = require('express-handlebars')
+const handlebars = require('handlebars');
+
+
+const handlebarsHelpers = require("handlebars-helpers");
+
 
 var mongoose = require("mongoose")
 mongoose.connect("mongodb://127.0.0.1:27017/user")
  
-const helpers=require('handlebars-helpers')
 var adminRouter = require('./routes/admin');
 var usersRouter = require('./routes/users');
 
@@ -21,14 +25,11 @@ var app = express();
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "hbs");
 
-// app.engine(
-//   "express-handlebars",
-//   hbs.engine({
-//     extname: "hbs",
-//     layoutsDir: __dirname + "/views/layouts/",
-//     partialsDir: __dirname + "/views/partials/",
-//   })
-// );
+app.engine('hbs',hbs.engine({extname:'hbs',
+defaultLayout:null,
+helpers:handlebarsHelpers()}))
+// hbs.registerHelper(handlebarsHelpers);
+
 
 
 app.use(logger('dev'));
@@ -46,7 +47,7 @@ app.use(session({
   secret:"mysecretKey",
   resave:false,
   saveUninitialized:true,
-  cookie:{maxAge:6000000}
+  cookie:{maxAge:6000000000}
 }))
 app.use('/', usersRouter);
 app.use('/admin', adminRouter);

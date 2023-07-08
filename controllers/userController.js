@@ -15,16 +15,23 @@ const { log } = require("handlebars/runtime")
 const categoryModel = require("../models/categoryModel");
 const Product=require("../models/productModel")
 
-const accountSid = "ACa547f4ad75438fee11d6c1f2b5cc0a4a";
-const authToken ="134aada0a6f8aeea3a9c3928db09a783";
-const verifySid = "VAb65553a60d1c6c15f8fb69e14c75d2f9";
-const client = require("twilio")(accountSid, authToken);
+
+
 const Cart= require("../models/cartModel")
 const Addresses = require("../models/addressesModel")
 var Address=require("../models/addressesModel")
 const Order = require('../models/orderModel')
 const moment = require("moment-timezone")
 // const EventEmitter = require('events');
+
+//new code for otp
+//twili ph no +18148139914
+const accountSid = "ACa547f4ad75438fee11d6c1f2b5cc0a4a";
+const authToken = '86c789bcead5a7ee77b5787983e4dcf5';
+const verifySid = "VAb65553a60d1c6c15f8fb69e14c75d2f9";
+const client = require("twilio")(accountSid, authToken);
+
+
 
 
 
@@ -100,11 +107,18 @@ const insertUser=async(req,res)=>{
     const userData=await user.save();
     console.log(userData);
 
-
-
+    // const existingUser = await User.findOne({ $or: [{ email }, { mobile }] });
+    // if (existingUser) {
+    //   res.render("users/signup", {
+    //     message: "Email or mobile number already exists",
+    //   });
+    // }
+    
     if(userData){
       sendVerifyMail(req.body.name,req.body.email,userData._id)
-      res.render('users/login')
+      res.render('users/emailVerificationNotation' ,{
+        message:"You signup is sucessfull pls check the mail"
+      })
 
     }else{
       res.render('users/signup',{message:"Error"})
@@ -112,6 +126,15 @@ const insertUser=async(req,res)=>{
 
   }catch(error){
    console.log(error.message);
+  }
+}
+
+
+const mailNotification=async(req,res)=>{
+  try{
+     res.render('users/login')
+  }catch(error){
+    console.log(error.message);
   }
 }
 
@@ -132,8 +155,8 @@ const verifyMail = async(req,res)=>{
 
 
 const loginLoad=async(req,res)=>{
-  try{
-     res.render('users/login',)
+  try{ 
+     res.render('users/login')
   }catch(error){
     console.log(error.message);
   }
@@ -151,7 +174,8 @@ const verifyLogin=async(req,res)=>{
     const passwordMatch=await bcrypt.compare(password,userData.password)
     if(passwordMatch){
       if(userData.is_verified === 0){
-   res.render('users/login',{message:"Please Verify your Mail"})
+   res.render('users/login')
+
    console.log("message printed.......................")
       }else if(userData.blocked ===true){
          res.render('users/block')
@@ -217,12 +241,23 @@ const forgetVerify =async(req,res)=>{
         const randomString= randomstring.generate();
        const updateData=await User.updateOne({email:email},{$set:{token:randomString}})
        sendResetPasswordMail(userData.name,userData.email,randomString)
-       res.render('users/forget',{message:"Please Check your Mail to reset your password"})
+       res.render('users/forgetPassPage',{message:"Please Check your Mail to reset your password"})
 
        }
     }else{
-      res.render('users/forget',{message:"User email is incorrect"})
+      res.render('users/forget',{message:"User email is incorrect Or Please enter a valid mail"})
     }
+  }catch(error){
+    console.log(error.message);
+  }
+}
+
+
+
+
+const notifyForPassReset=async(req,res)=>{
+  try{
+     res.render('users/forgetPassPage')
   }catch(error){
     console.log(error.message);
   }
@@ -319,24 +354,121 @@ const singleProductDetails=async(req,res)=>{
 const getOtp=(req,res)=>{
   res.render('users/otp')
 }
-const sendOtp=(req,res)=>{
-client.verify.v2
-.services(verifySid)
-.verifications.create({ to: "+916235095693", channel: "sms" })
-.then((verification) => console.log(verification.status))
-res.render('users/otpVerification')
+
+// const sendOtp=(req,res)=>{
+// client.verify.v2
+// .services(verifySid)
+// .verifications.create({ to: "+916235095693", channel: "sms" })
+// .then((verification) => console.log(verification.status))
+// res.render('users/otpVerification')
+// }
+
+const sendOtp= async (req, res) => {
+  try {
+
+      console.log(req.body.number,"requiring mobile no");
+      let mobile = req.body.number;
+
+      console.log(mobile ,'mobile no');
+req.session.userMobileForOtp = mobile;
+const userData = await User.findOne({ mobile: mobile })
+console.log(userData);
+if (userData) {
+  if (userData.is_verified === 1) {
+      const userMobile = "+91" + mobile;
+      console.log(userMobile,"userMobile...");
+      client.verify.v2
+          .services(verifySid)
+          .verifications.create({ to: userMobile, channel: "sms" })
+          .then((verification) => {
+            console.log(verification.status,'staus..........');
+              if (verification.status === "pending") {
+
+                  res.render('users/otpVerification')
+
+              } else {
+                  res.render('users/otp', { message: "OTP sending failed"  })
+              }
+          })
+
+  } else {
+      res.render('users/otp', { message: "You have to verify email before OTP login"  })
+  }
+
+} else {
+  res.render('users/otp', { message: "You have to signup before OTP login"  })
+}
+} catch (error) {
+throw new Error(error.message);
+}
 }
 
-const verifyOtp=(req,res)=>{
-  otpCode=req.body.otp
-  client.verify.v2
-    .services(verifySid)
-    .verificationChecks.create({ to: "+916235095693", code: otpCode })
-    .then((verification_check) => console.log(verification_check.status))
+
+
+
+
+// const verifyOtp=(req,res)=>{
+//   otpCode=req.body.otp
+//   client.verify.v2
+//     .services(verifySid)
+//     .verificationChecks.create({ to: "+916235095693", code: otpCode })
+//     .then((verification_check) => console.log(verification_check.status))
+//     res.render('users/home')
   
+// }
+
+
+
+
+const verifyOtp= async (req, res) => {
+  try {
+      const userMobile = "+91" + req.session.userMobileForOtp
+      console.log(userMobile);
+      const otp = req.body.otp;
+      client.verify.v2
+          .services(verifySid)
+          .verificationChecks.create({ to: userMobile, code: otp })
+          .then(async (verification_check) => {
+              if (verification_check.status === 'approved') {
+                  console.log(verification_check.status)
+                  let user = await User.findOne({ mobile: req.session.userMobileForOtp })
+
+                  req.session.user_id = user._id;
+
+                  console.log(req.session.user_id);
+
+                  res.redirect('/home');
+              } else {
+                  res.render('users/otpVerification', { message: "invalid OTP"})
+              }
+
+          });
+  } catch (error) {
+
+      throw new Error(error.message);
+  }
 }
 
 
+
+
+
+const mobilePage = async(req,res)=>{
+  try{
+    const userData = await User.findById({ _id: req.session.user_id});
+    const productData = await Product.find({unlist:false}).lean();
+    const categoryData = await categoryModel.find({unlist:false }).lean();
+
+  res.render("users/mobile", {
+     user: userData,
+    Product: productData,
+    category: categoryData,
+  });
+    
+  }catch(error){
+    console.log(error.message);
+  }
+}
 
 
 
@@ -668,39 +800,6 @@ const blockUser=async(req,res)=>{
 
 
 
-  
-  
-  
-
-  
-  
-  // const updateProfile = async (req, res) => {
-  //   try {
-  //     const user_id = req.query.id; 
-  
-  //     if (req.file) {
-  //       await User.findByIdAndUpdate({ _id: user_id }, {
-  //         $set: { name: req.body.name, email: req.body.email, mobile: req.body.mobile }
-  //       });
-  //     } else {
-  //       await User.findByIdAndUpdate({ _id: user_id }, {
-  //         $set: { name: req.body.name, email: req.body.email, mobile: req.body.mobile }
-  //       });
-  //     }
-  
-  //     res.redirect('/home');
-  //   } catch (error) {
-  //     console.log(error.message);
-  //   }
-  // };
-  
-  
-
-
-
-  
- 
-
 
 
 
@@ -821,9 +920,7 @@ const addAddress = async (req, res) => {
     // const userData = await User.findOne({ _id: userId }).lean();
 
      const userId = req.session.user_id;
-
     //      const id = new mongoose.Types.ObjectId(req.session.user_id);
-
   
     const name = req.body.name;
    const mobile=req.body.mobile;
@@ -915,62 +1012,6 @@ const setAsDefault= async (req, res) => {
 }
 
 
-
-// const addNewAddress= async (req, res) => {
-//   try {
-//       const userId = req.session.user_id
-//       const { 
-//         name,
-//          mobile, 
-//          homeAddress, 
-//          city, 
-//          street, 
-//          postalCode 
-//         } = req.body;
-
-//       console.log(name);
-//       console.log(mobile);
-
-//       console.log(city);
-//       console.log(street);
-//       console.log(postalCode);
-//       const newAddress = {
-//           name: name,
-//           mobile: mobile,
-//           homeAddress: homeAddress,
-//           city: city,
-//           street: street,
-//           postalCode: postalCode,
-//           isDefault: false, // Set the default flag to false by default
-//       };
-
-//       // Find the user's address document based on the user_id
-//       let userAddress = await Address.findOne({ user_id: userId });
-
-//       if (!userAddress) {
-//           // If the user doesn't have any address, create a new document
-//           newAddress.isDefault = true;
-//           userAddress = new Address({ user_id: userId, address: [newAddress] });
-//       } else {
-//           // If the user already has an address, push the new address to the array
-//           userAddress.address.push(newAddress);
-//           // Check if there is only one address in the array
-//           if (userAddress.address.length === 1) {
-//               // If there is only one address, set it as the default
-//               userAddress.address[0].isDefault = true;
-//           }
-//       }
-
-//       await userAddress.save(); // Save the updated address document
-//       console.log(userAddress, 'useraddress');
-
-//       res.redirect('/checkout');
-
-//   } catch (error) {
-//       throw new Error(error.message);
-//   }
-// }
-// //end of pcw
 
 
 
@@ -1064,12 +1105,18 @@ const editAddress= async (req, res) => {
 
 const loadCheckout= async (req, res) => {
   try {
+    
       const userId = req.session.user_id;
       console.log(userId, 'id');
       // Find the default address for the user
       const defaultAddress = await Address.findOne({ user_id: userId, 'addresses.is_default': true }, { 'addresses.$': 1 }).lean();
 
       console.log(defaultAddress, 'default address');
+      if(defaultAddress===null){
+        res.redirect('/address')
+       }else{
+
+      
 
       // Find the user document and extract the address array
       const userDocument = await Address.findOne({ user_id: userId }).lean();
@@ -1080,7 +1127,7 @@ const loadCheckout= async (req, res) => {
       const filteredAddresses = addressArray.filter(address => !address.is_default);
       console.log(filteredAddresses, 'filteredAddresses');
 
-
+     
 
       // finding cart products //
     
@@ -1131,88 +1178,12 @@ const loadCheckout= async (req, res) => {
               finalAmount,
           });
 
-
+        }
 
   } catch (error) {
       throw new Error(error.message);
   }
 }
-
-
-// const loadCheckout = async (req, res) => {
-//   try {
-
-  
-
-//     const userId = req.session.user_id;
-//     console.log(userId, 'id');
-
-//     // Find the default address for the user
-//     const defaultAddress = await Address.findOne(
-//       { user_id: userId, 'addresses.is_default': true },
-//       { 'addresses.$': 1 }
-//     ).lean();
-
-//     console.log(defaultAddress, 'default address');
-
-//     // Find the user document and extract the address array
-//     const userDocument = await Address.findOne({ user_id: userId }).lean();
-//     const addressArray = userDocument.addresses;
-//     console.log(addressArray, 'addressArray');
-
-//     // Filter the addresses where isDefault is false
-//     const filteredAddresses = addressArray.filter(
-//       (address) => !address.is_default
-//     );
-//     console.log(filteredAddresses, 'filteredAddresses');
-
-//     // Check if there are no addresses
-//     if (!defaultAddress || filteredAddresses.length === 0) {
-//       return res.redirect('/checkout');
-//     }
-
-//     // Finding cart products
-//     const cart = await Cart.findOne({ user_id: req.session.user_id })
-//       .populate({
-//         path: 'products.productId',
-//         populate: { path: 'category', select: 'category' },
-//       })
-//       .lean()
-//       .exec();
-
-//     const products = cart && cart.products ? cart.products.map((product) => {
-//       const total = Number(product.quantity) * Number(product.productId.price);
-//       return {
-//         _id: product.productId._id.toString(),
-//         name: product.productId.name,
-//         category: product.productId.category.category,
-//         images: product.productId.images,
-//         price: product.productId.price,
-//         description: product.productId.description,
-//         quantity: product.quantity,
-//         total,
-//         user_id: req.session.user_id,
-//       };
-//     }) : [];
-
-//     const total = products.reduce((sum, product) => sum + Number(product.total), 0);
-//     const finalAmount = total;
-//     // Get the total count of products
-//     const totalCount = products.length;
-
-//     res.render('users/checkout', {
-//       defaultAddress: defaultAddress.addresses[0],
-//       filteredAddresses: filteredAddresses,
-//       products,
-//       total,
-//       totalCount,
-//       subtotal: total,
-//       finalAmount,
-//     });
-//   } catch (error) {
-//     throw new Error(error.message);
-//   }
-// };
 
 
 
@@ -1267,7 +1238,7 @@ const placeOrder= async (req, res) => {
 
       const userId = req.session.user_id;
       console.log(userId, 'id from placeOrderMeth');
-
+      
       const orderStatus = paymentMethod === "COD" ? "Placed" : "Pending";
       console.log(orderStatus, "orderStatus");
 
@@ -1376,6 +1347,7 @@ const loadOrdersView = async (req, res) => {
           })
 
 
+
       const createdOnIST = moment(order.date).tz('Asia/Kolkata').format('DD-MM-YYYY h:mm A');
       order.date = createdOnIST;
 
@@ -1387,6 +1359,7 @@ const loadOrdersView = async (req, res) => {
               name: product.productId.productname,
               image: images,
               price: product.productId.price,
+
               total: product.total,
               quantity: product.quantity,
               status : order.orderStatus,
@@ -1396,6 +1369,7 @@ const loadOrdersView = async (req, res) => {
       
 
       const deliveryAddress = {
+
         name: order.addressDetails.name,
         address: order.addressDetails.address,
         city: order.addressDetails.city,
@@ -1404,8 +1378,8 @@ const loadOrdersView = async (req, res) => {
     };
 
     const subtotal = order.orderValue;
-    // const cancellationStatus = order.cancellationStatus
-    // console.log(cancellationStatus,'cancellationStatus');
+    const cancellationStatus = order.cancellationStatus
+    console.log(cancellationStatus,'cancellationStatus');
    
     console.log(subtotal, 'subtotal');
     
@@ -1420,26 +1394,60 @@ const loadOrdersView = async (req, res) => {
        
         orderId: orderId,
         orderDate: createdOnIST,
-        // cancellationStatus:cancellationStatus,
+        cancellationStatus:cancellationStatus,
        
+
     });
 } catch (error) {
     throw new Error(error);
 }
 }
- 
 
+
+const cancelOrder = async (req, res) => {
+  try {
+    const id = req.body.orderId;
+    const url = '/ordersView?id=' + id;
+
+    const updateOrder = await Order.findByIdAndUpdate(
+      { _id: new ObjectId(id) },
+      { $set: { orderStatus: "Pending",  cancellationStatus: "cancellation requested" } },
+      { new: true }
+    ).exec();
+
+    res.redirect(url);
+  } catch (error) {
+    console.log(error.message);
+  }
+};
+
+
+
+
+
+
+
+ 
+const loadShopPage=async(req,res)=>{
+  try {
+    res.render('users/shop')
+  } catch (error) {
+    console.log(error.messge);
+  }
+}
 
 
 module.exports={
   loadSignup,
   insertUser,
+  mailNotification,
   verifyMail,
   loginLoad,
   verifyLogin,
   loadHome,
   forgetLoad,
   forgetVerify,
+  notifyForPassReset,
   forgetPasswordLoad,
   resetPassword,
   
@@ -1451,7 +1459,7 @@ module.exports={
   sendOtp,
   verifyOtp,
 
-
+  mobilePage,
   aboutPage,
   userLogout,
   
@@ -1478,5 +1486,7 @@ module.exports={
  placeOrder,
  orderDetails,
  loadOrdersView,
+ cancelOrder,
+ loadShopPage,
 }
 

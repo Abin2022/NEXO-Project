@@ -1,5 +1,20 @@
 	<link rel="stylesheet" href="/stylesheets/forget.css">  
     
+      <style>
+  
+  .otp-container{
+     display: flex;
+      justify-content: center;
+      align-items: center;
+      
+  }
+  .otp-logo{
+    display: block;
+      margin: 0 auto;
+      max-height: 81px;
+  }
+ </style>
+ 
 
 		<div class="row">
 		
@@ -19,8 +34,12 @@
  
   <button type="submit" >Get OTP</button>   
      </form>
+        {{#if message}}
+                <p><span style="font-family: Arial, sans-serif; color: rgb(14, 15, 14); display:inline-block">{{message}}</span></p>
+
+          {{/if}}
        <p>
-    <b onclick="toggle()" class="pointer"><a href="/">Back to Login Page</a></b>
+    <b onclick="toggle()" class="pointer"><a href="/signup">Back to Signup Page</a></b>
       </p>
 	</div>
  </div>
