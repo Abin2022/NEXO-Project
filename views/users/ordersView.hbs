@@ -379,21 +379,23 @@
                 </div>
             </div>
             {{/each}}
-            <div class="row justify-content-end mt-3">
-                <div class="col-auto">
-                    {{#if (eq cancellationStatus "Not requested")}}
-                   
-                        <button type="button" 
-                            class="btn btn-danger btn-sm" onclick="showCancelConfirmationModal('{{orderId}}')">Cancel</button>
-                    
-                    {{else if (eq cancellationStatus "cancellation requested")}}
-                    <button type="button" class="btn btn-danger btn-sm">Cancel requested</button>
-                    {{else if (eq cancellationStatus "cancelled")}}
-                    
+            <div class="row justify-content-center mt-3">
+    <div class="col-auto text-center">
+        {{#if (eq cancellationStatus "Not requested")}}
 
-                    {{/if}}
-                </div>
-            </div>
+            <button type="button" class="btn btn-danger btn-sm" onclick="showCancelConfirmationModal('{{orderId}}')">Cancel Order</button>
+        {{else if (eq cancellationStatus "cancellation requested")}}
+
+            <button type="button" class="btn btn-danger btn-sm" onclick="showUndoCancelConfirmationModal('{{orderId}}')">UNDO Cancel request</button>
+        {{else if (eq cancellationStatus "Not Requested")}}
+
+            <button type="button" class="btn btn-danger btn-sm" onclick="showCancelConfirmationModal('{{orderId}}')">Cancel Order</button>
+        {{else if (eq cancellationStatus "cancelled")}}
+          
+        {{/if}}
+    </div>
+</div>
+
 
             <div class="row mt-4">
                 <div class="col">
@@ -480,6 +482,52 @@
         </div>
     </div>
 </div>
+
+
+
+{{!-- newly added --}}
+
+<div class="modal" id="undoCancelConfirmationModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Undo Cancel Confirmation</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to undo the cancellation of the order?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+                <form action="/undo-cancel" method="post">
+                    <button type="submit" class="btn btn-danger" id="confirmUndoCancelBtn" name="orderId" value="{{orderId}}">Yes, Undo Cancel</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+    function showUndoCancelConfirmationModal(orderId) {
+        var confirmUndoCancelBtn = document.getElementById("confirmUndoCancelBtn");
+        confirmUndoCancelBtn.value = orderId;
+        var modal = new bootstrap.Modal(document.getElementById("undoCancelConfirmationModal"));
+        modal.show();
+    }
+</script>
+
+
+
+
+
+
+
+
+
 <script>
     function showCancelConfirmationModal(orderId) {
         var confirmCancelBtn = document.getElementById("confirmCancelBtn");

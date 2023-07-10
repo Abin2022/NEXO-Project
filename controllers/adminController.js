@@ -3,6 +3,7 @@ const User = require("../models/userModel")
 const bcrypt=require('bcrypt')
 const Product=require("../models/productModel")
 
+const fs = require('fs')
 //multer
 const multer = require("multer");
 const path = require("path");
@@ -183,10 +184,10 @@ const editProduct = async (req, res) => {
         ...updatedProduct,
         category: lookupCategory(updatedProduct.category),
       };
+      console.log('nantha santhappan',productWithCategoryName);
 
       res.render("admin/edit-product", {
         product: productWithCategoryName,
-        
         categories: categoryData,
       });
     } else {
@@ -198,59 +199,103 @@ const editProduct = async (req, res) => {
   }
 };
 
-// const updateProduct = async (req, res) => {
-//   console.log("Enterd into updateProduct.....");
-//   try {
-//      //here###
-//      var arrayImage=[]
-//      for (let i = 0; i < req.files.length; i++) {
-//        arrayImage[i] = req.files[i].filename;
-//      }
-//      console.log(arrayImage,"arrayimag");
-//     const id = req.body.id;
-//     const updatedProduct = {
-//       brand: req.body.brand,
-//       productname: req.body.productname,
-//       category: req.body.category,
-//       price: req.body.price,
-//       images: req.body.images,
-//       images: arrayImage,
-//       description: req.body.description,
-//     };
-//     console.log("updatedProduct",updateProduct);
-//     await Product.findByIdAndUpdate(id, updatedProduct);
-//     res.redirect("/admin/home");
-//   } catch (error) {
-//     console.log(error.message);
-//   }
-// };
+const deleteimg = async (req, res) => {
+  try {
+    const { imgName, productId } = req.body;
+    console.log(req.body);
+    console.log(productId);
+    const isValidObjectId = mongoose.Types.ObjectId.isValid(productId);
+    console.log(isValidObjectId);
+
+    if (!isValidObjectId) {
+      return res.status(400).json({ success: false, error: 'Invalid product ID.' });
+    }
+
+    const product = await Product.findById(productId);
+
+    if (!product) {
+      return res.status(404).json({ success: false, error: 'Product not found.' });
+    }
+
+    console.log(product);
+
+    // Find the index of the image with the specified imgName
+    const imageIndex = product.images.findIndex((image) => image === imgName);
+
+    // If the image exists, remove it from the images array
+    if (imageIndex !== -1) {
+      product.images.splice(imageIndex, 1);
+      await product.save();
+      console.log('Image removed successfully');
+    } else {
+      console.log('Image not found');
+    }
+
+    res.status(200).json({ success: true, message: 'Image deleted successfully.' });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ success: false, error: 'Image deletion failed.' });
+  }
+};
+
+
+
+// console.log(product);
+
 
 const updateProduct = async (req, res) => {
-  console.log("Entered into updateProduct...");
+  console.log("Enterd into updateProduct.....");
   try {
-    var arrayImage = [];
-    if (req.files && req.files.length) {
-      for (let i = 0; i < req.files.length; i++) {
-        arrayImage[i] = req.files[i].filename;
-      }
-    }
-    console.log(arrayImage, "arrayImage");
+     //here###
+     var arrayImage=[]
+     for (let i = 0; i < req.files.length; i++) {
+       arrayImage[i] = req.files[i].filename;
+     }
+     console.log(arrayImage,"arrayimag");
     const id = req.body.id;
     const updatedProduct = {
       brand: req.body.brand,
       productname: req.body.productname,
       category: req.body.category,
       price: req.body.price,
+      images: req.body.images,
       images: arrayImage,
       description: req.body.description,
     };
-    console.log("updatedProduct", updatedProduct);
+    console.log("updatedProduct",updateProduct);
     await Product.findByIdAndUpdate(id, updatedProduct);
     res.redirect("/admin/home");
   } catch (error) {
     console.log(error.message);
   }
 };
+
+// const updateProduct = async (req, res) => {
+//   console.log("Entered into updateProduct...");
+//   try {
+//     var arrayImage = [];
+//     if (req.files && req.files.length) {
+//       for (let i = 0; i < req.files.length; i++) {
+//         arrayImage[i] = req.files[i].filename;
+//       }
+//     }
+//     console.log(arrayImage, "arrayImage");
+//     const id = req.body.id;
+//     const updatedProduct = {
+//       brand: req.body.brand,
+//       productname: req.body.productname,
+//       category: req.body.category,
+//       price: req.body.price,
+//       images: arrayImage,
+//       description: req.body.description,
+//     };
+//     console.log("updatedProduct", updatedProduct);
+//     await Product.findByIdAndUpdate(id, updatedProduct);
+//     res.redirect("/admin/home");
+//   } catch (error) {
+//     console.log(error.message);
+//   }
+// };
 
 
 
@@ -351,7 +396,7 @@ const listProducts = async (req, res) => {
   const editCategory = async (req, res) => {
     try {
       const { category: editCategory } = req.body;
-      const categoryId = req.params.id;
+      const categoryId = req.params.id; 
   
       const existingCategory = await Category.findById(categoryId);
       if (!existingCategory) {
@@ -591,12 +636,14 @@ const loadOrdersView=async(req,res)=>{
           };
       });
 
+
       const deliveryAddress = {
           name: order.addressDetails.name,
          address: order.addressDetails.address,
           city: order.addressDetails.city,
           state: order.addressDetails.state,
           pincode: order.addressDetails.pincode,
+
       };
 
 
@@ -622,7 +669,6 @@ const loadOrdersView=async(req,res)=>{
       throw new Error(error.message);
   }
 }
-
 
 
 const cancelledByAdmin = async (req, res) => {
@@ -682,6 +728,7 @@ const rejectCancellation = async (req, res) => {
 
 const productDelevery = async (req, res) => {
   try {
+    console.log("entered into product delivery stage.................");
     const orderId = req.body.orderId;
     console.log(orderId, 'id here............');
 
@@ -691,7 +738,7 @@ const productDelevery = async (req, res) => {
       { new: true }
     ).exec();
 
-    console.log(updateOrder, 'updateOrderrrrrrrrrrrrrrrrrrrrrrrrrrrrrr');
+    console.log(updateOrder, 'updateOrder');
 
     const url = '/admin/ordersView?id=' + orderId;
     console.log(url, 'Here is the url..................');
@@ -740,6 +787,7 @@ module.exports = {
     verifyLogin,
     loadDashboard,
     adminLogout,
+    deleteimg,
 
     loadProducts,
     insertProducts,

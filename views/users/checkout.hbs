@@ -171,6 +171,8 @@
                                          <li class="nav-item active"><a class="nav-link" href="#"> Mobiles</a></li>
 
                                             <li class="nav-item active"><a class="nav-link" href="#">Laptops</a></li>
+                                             <li class="nav-item active"><a class="nav-link"   href="/shop">SHOP</a></li>
+
 
                                             {{!-- <li class="nav-item dropdown">
                                                 <a class="nav-link dropdown-toggle" href="#" id="karlDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Pages</a>
@@ -271,7 +273,7 @@
                         </li>
                         {{/each}}
                        
-                        <li class="list-group-item d-flex justify-content-between bg-light">
+                         <li class="list-group-item d-flex justify-content-between bg-light">
                             <div class="text-success">
                                 <h6 class="my-0">FREE</h6>
                                 <small>Shipping charge</small>
@@ -294,6 +296,37 @@
                         </div>
                     </form>
                 </div>
+                
+                 {{!-- <li class="list-group-item d-flex justify-content-between bg-light">
+                            <div class="text-success">
+                                <h6 class="my-0">Coupon code</h6>
+                                <small>EXAMPLECODE</small>
+                            </div>
+                            <span class="text-success">-₹{{this.couponDiscount}}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span>Total(INR)</span>
+                            <strong>₹{{this.subtotal}}</strong>
+                        </li>
+                    </ul>
+                    <form class="card p-2" action="/apply-coupon-request" method="POST">
+                        <div class="input-group">
+                            <input type="text" class="form-control" placeholder="Coupon code" name="couponCodeFromUser">
+                            {{#if couponApplied}}
+
+                            <p style="color: #c3b1ad;"><b>{{couponApplied}}</b></p>
+
+                            {{else if couponError}}
+
+                            <p style="color: red;"><b>{{couponError}}</b></p>
+
+                            {{/if}}
+                            <div class="input-group-append">
+                                <button type="submit" class="btn btn-secondary">Redeem</button>
+                            </div>
+                        </div>
+                    </form>
+                </div> --}}
                 {{/if}}
   
 
@@ -301,7 +334,7 @@
                 
                 <div class="col-md-8 order-md-1">
                     <h4 class="mb-3">Billing address</h4>
-                    <form class="needs-validation" novalidate="" method="post" action="/place-order">
+                    <form class="needs-validation" novalidate="" id="checkout-form">
 
 
 
@@ -364,7 +397,7 @@
                                     data-target="editingAddress" type="button">Edit Address</button>
                             </div> --}}
                             <div class="col-md-3 mb-3">
-  <a href="/address" class="btn btn-dark btn-lg btn-block" data-toggle="modal" data-target="#editingAddress">Edit Address</a>
+  <a href="/edit-address" class="btn btn-dark btn-lg btn-block" data-toggle="modal" data-target="#editingAddress">Edit Address</a>
 </div>
                                             <div class="col-md-3 mb-3">
   <a href="/delete-address?id={{this._id}}" class="btn btn-dark btn-lg btn-block"  onclick="return confirm('Are you sure you want to delete this Address?')">Delete Address</a>
@@ -380,16 +413,26 @@
                         <hr class="mb-4">
                         <h4 class="mb-3" style="color: #343a40;">Payment</h4>
                         <div class="d-block my-3">
-                            <div class="custom-control custom-radio">
+                            {{!-- <div class="custom-control custom-radio">
                                 <input id="credit" name="paymentMethod" type="radio" class="custom-control-input"
                                     checked="" required="" value="COD" style="color: #343a40;">
                                 <label class="custom-control-label" for="credit">COD</label>
                             </div>
-                            {{!-- <div class="custom-control custom-radio">
+                            <div class="custom-control custom-radio">
                                 <input id="debit" name="paymentMethod" type="radio" class="custom-control-input"
                                     required="" style="color: #343a40;">
                                 <label class="custom-control-label" for="debit">ONLINE</label>
                             </div> --}}
+                              <div class="custom-control custom-radio">
+                                <input id="credit" name="paymentMethod" type="radio" class="custom-control-input"
+                                    checked="" required="" value="COD">
+                                <label class="custom-control-label" for="credit">COD</label>
+                            </div>
+                            <div class="custom-control custom-radio">
+                                <input id="debit" name="paymentMethod" type="radio" class="custom-control-input"
+                                    required="" value="ONLINE">
+                                <label class="custom-control-label" for="debit">ONLINE</label>
+                            </div>
 
                         </div>
 
@@ -399,7 +442,7 @@
                             checkout</button> --}}
                             
                              <hr class="mb-4">
-                        <button class="btn btn-dark btn-lg btn-block btn-checkout" type="submit">Continue to
+                        <button class="btn btn-dark btn-lg btn-block btn-checkout" id="checkout-button" type="submit">Continue to
                             checkout</button>
                             
                     </form>
@@ -495,7 +538,7 @@
       </div>
       <div class="modal-body">
         {{!-- <form action="/add-new-address" method="post"> --}}
-       <form action="/address" method="post">
+       <form action="/add-new-address" method="post">
 
           <div class="form-group">
             <label for="edit-username">Name</label>
@@ -532,10 +575,9 @@
 </div>
 
 {{!-- footer --}}
-
 <!--Edit address Modal -->
 <div class="modal fade" id="editingAddress" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle"
-  aria-hidden="true" style="color: #343a40;">
+  aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
@@ -545,30 +587,32 @@
         </button>
       </div>
       <div class="modal-body">
+        {{!-- metheod post --}}
         <form action="/edit-address" method="post">
           <div class="form-group">
             <label for="edit-username">Name</label>
-            <input type="text" class="form-control" name="name" id="edit-username" value="{{this.name}}" required>
+            <input type="text" class="form-control" name="name" id="edit-name" value=" {{this.name}}" required>
           </div>
           <div class="form-group">
             <label for="edit-email">Mobile</label>
-            <input type="text" class="form-control" name="mobile" id="edit-email" value="{{this.mobile}}" required>
+            <input type="text" class="form-control" name="mobile" id="edit-mobile" value="{{this.mobile}}" required>
           </div>
           <div class="form-group">
             <label for="edit-phone">Address</label>
-            <input type="text" class="form-control" name="address" id="edit-phone" value="{{this.address}}" required>
+            <input type="text" class="form-control" name="address" id="edit-address"  value="{{this.address}}" required>
           </div>
           <div class="form-group">
             <label for="edit-email">City</label>
-            <input type="text" class="form-control" name="city" id="edit-email" value="{{this.city}}" required>
+            <input type="text" class="form-control" name="city" id="edit-city" value="{{this.city}}" required>
           </div>
           <div class="form-group">
             <label for="edit-email">State</label>
-            <input type="text" class="form-control" name="state" id="edit-email" value="{{this.state}}" required>
+            <input type="text" class="form-control" name="state" id="edit-state" value="{{this.state}}" required>
           </div>
           <div class="form-group">
             <label for="edit-email">Postal code</label>
-            <input type="number" class="form-control" name="pincode" id="edit-email" value="{{this.pincode}}" required>
+            <input type="number" class="form-control" name="pincode" id="edit-pincode" value="{{this.pincode}}"
+              required>
           </div>
           <input type="hidden" class="form-control" name="_id" id="edit-_id">
           <div class="modal-footer">
@@ -576,6 +620,7 @@
             <button type="submit" class="btn btn-primary add-button">Edit</button>
           </div>
         </form>
+
       </div>
     </div>
   </div>
@@ -670,6 +715,43 @@
 
 
 
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+  $(document).ready(function () {
+    // Set the address details in the edit modal when the edit button is clicked
+    $('.edit-button').click(function () {
+
+      var name = $(this).data('name');
+      var mobile = $(this).data('mobile');
+      var address = $(this).data('address');
+      var city = $(this).data('city');
+      var state = $(this).data('state');
+      var pincode = $(this).data('pincode');
+      var _id = $(this).data('_id');
+
+      $('#edit-name').val(name);
+      $('#edit-mobile').val(mobile);
+      $('#edit-address').val(address);
+      $('#edit-city').val(city);
+      $('#edit-state').val(state);
+      $('#edit-pincode').val(pincode);
+      $('#edit-_id').val(_id);
+    });
+  });
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
 <script >
     (function () {
         'use strict'
@@ -690,6 +772,129 @@
             })
         }, false)
 </script>
+
+
+
+
+
+
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+// JavaScript to make Ajax call for Checkout Button - called by checkout button in place-order page
+<script>
+
+
+    $(document).ready(function () {
+
+        $('#checkout-button').click(function (e) {
+
+            e.preventDefault(); // To prevent default method of submitting form as here Ajax should be used here to submit the form based on the two different payment methods
+
+            console.log("Checkout Button Ajax call");
+
+            $.ajax({
+
+                url: '/place-order',
+
+                method: 'POST',
+
+                data: $('#checkout-form').serialize(), // Here serialize function is used to get all the data from the form into the data feild of ajax call
+
+                success: (response) => {
+
+                    if (response.COD_CHECKOUT) {
+                        location.href = '/orderPlaced'
+                    } else if (response.ONLINE_CHECKOUT) {
+                        makeRazorpayPayment(response);
+                    } else {
+                        location.href = '/orderFailed'
+                        // If any of the above payment didn't happen, Should create a failed order page to user and display
+                    }
+
+                }
+
+            })
+
+        })
+
+        function makeRazorpayPayment(serverOrderData) {
+            let razorpayKeyId = serverOrderData.razorpayKeyId;
+            let orderDetails = serverOrderData.orderDetails;
+            let userDetails = serverOrderData.userDetails;
+            let userOrderRequestData = serverOrderData.userOrderRequestData;
+
+            let paymentDataToRazorpayServer = {
+                "key": razorpayKeyId,
+                "amount": orderDetails.amount,
+                "currency": "INR",
+                "name": "NEXO-PROJECT-COPY",
+                "description": "Test Transaction",
+                "order_id": orderDetails.id,
+                "handler": function (response) {
+                    verifyPayment(response, orderDetails);
+                },
+                "prefill": {
+                    "name": userDetails.name,
+                    "email": userDetails.email,
+                    "contact": userOrderRequestData.mobile
+                },
+                "notes": {
+                    "Customer Address": userOrderRequestData.homeAddress
+                }
+            };
+
+            var razorpayPayment = new Razorpay(paymentDataToRazorpayServer);
+            razorpayPayment.open();
+
+            // If the payment failed for any reason, calling the pre-defined function "on" in Razorpay module using the object of Razorpay
+        }
+
+        function verifyPayment(razorpayServerPaymentResponse, serverOrderDetails) {
+            $.ajax({
+                url: '/verify-payment',
+                data: {
+
+                    razorpayServerPaymentResponse,
+
+                    serverOrderDetails
+
+                },
+                method: 'POST',
+
+                success: (response) => {
+                    if (response.status) {
+                        location.href = '/orderPlaced'
+                    } else {
+                        location.href = '/orderFailed'
+                    }
+                }
+            })
+        }
+
+    })
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

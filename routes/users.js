@@ -5,7 +5,7 @@ const config = require("../config/config")
 const session=require("express-session")
 const auth=require("../middlewares/auth")
 
-
+const couponController=require("../controllers/couponController")
 
 const multer = require('multer')
 const path = require('path');
@@ -46,7 +46,6 @@ router.post('/sendOtp',userControllers.sendOtp)
 router.post('/verifyOtp',userControllers.verifyOtp)
 
 
-
 // router.get('/mobile',auth.isLogin,userControllers.mobilePage)
 
 
@@ -58,19 +57,31 @@ router.post('/verifyOtp',userControllers.verifyOtp)
    router.get('/address',userControllers.loadAddress)  
    router.post('/address',userControllers.addAddress);
    router.post('/set-as-default',userControllers.setAsDefault);
-// router.post('/add-new-address',userControllers.addNewAddress)
-
 router.get('/delete-address',auth.isLogin,userControllers.deleteAddress);
 router.post('/edit-address',userControllers.editAddress);
+
+
+router.post('/add-new-address',userControllers.addNewAddress)
+// router.post('/edit-addressCheckoutPage',userControllers.editAddressCheckoutPage);
+
 
  
  router.get('/checkout',auth.isLogin,userControllers.loadCheckout);
  router.post('/change-address',userControllers.changeAddress);
 
- router.post('/place-order',userControllers.placeOrder)
+ // in checkout page
+ router.post('/place-order',auth.isLogin,userControllers.placeOrder)
+
+  router.get('/orderPlaced',auth.isLogin,userControllers.orderPlaced);
+  router.get('/orderFailed',auth.isLogin,userControllers.orderFailed)
+
+
+
  router.get('/order-details',auth.isLogin,userControllers.orderDetails)
   router.get('/ordersView',auth.isLogin,userControllers.loadOrdersView)
    router.post('/cancel-order',userControllers.cancelOrder)
+   router.post('/undo-cancel',userControllers.undoCancel)
+
 
 
  router.post('/addtocart',auth.isLogin,userControllers.addToCart)
@@ -80,9 +91,11 @@ router.post('/change-product-quantity',userControllers.changeQuantity)
 
 // router.get('/checkout',auth.isLogin,userControllers.checkoutPage)
 
+router.post('/apply-coupon-request', couponController.applyCouponPOST);
 
 router.get('/block',userControllers.blockUser)
 router.get('/shop',auth.isLogin,userControllers.loadShopPage)
+
 
 
 module.exports=router

@@ -47,7 +47,7 @@ router.post( "/add-products", uploads.array("image",4), adminController.insertPr
 router.get("/edit-product",adminAuth.isLogin,adminController.editProduct)
 router.post("/edit-product",adminAuth.isLogin,uploads.array("image",4),adminController.updateProduct)
 // router.get('/deleteImage',adminAuth.isLogin,adminController.deleteImageSolo)
-
+router.delete('/delete-img',adminController.deleteimg)
 router.get( "/unlist-products",adminAuth.isLogin, adminController.unlistProducts);
 router.get("/list-products", adminAuth.isLogin, adminController.listProducts);
 
@@ -78,12 +78,12 @@ router.get('/orders',adminAuth.isLogin,adminController.getUserOrders)
  router.get('/manage-coupons',adminAuth.isLogin,couponController.manageCoupon);
    router.get('/add-coupon',adminAuth.isLogin, couponController.addNewCouponPage);
 router.post('/add-coupon', couponController.addNewCoupon); 
- router.get('/inactive-coupons',adminAuth.isLogin,couponController.inactiveCouponsPage);
+ router.get('/coupon-deactivated',adminAuth.isLogin,couponController.inactiveCouponsPage);
 
  router.get('/coupon-edit',adminAuth.isLogin, couponController.editCouponPage);
  router.post('/update-coupon',couponController.updateCoupon)
 
-//  router.post('/change-coupon-status',couponController.changeCouponStatusPOST)
+ router.post('/change-coupon-status',couponController.changeCouponStatus)
 
 router.get('*',(req,res)=>{ 
     res.redirect('/admin')

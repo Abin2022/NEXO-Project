@@ -31,20 +31,65 @@
   </div>
 
  <a href="#">
-  <button type="submit" value="Verify OTP" >Submit</button>
+  <button type="submit" value="Verify OTP"  >Submit</button>
 </a>
+             
+             <div>
+    <div id="resendOtp" class="text-dark"style="text-align: center;">
+        {{{timerValue}}} seconds remaining
+    </div>
+{{!-- 
+    <div  style="text-align: center;">
+        <a href="/sendOtp" method="post">resend otp</a>
+    </div> --}}
+</div>
+
+
+
+                
 
 
            {{#if message}}
                 <p><span style="font-family: Arial, sans-serif; color: green; display:inline-block">{{message}}</span></p>
 
           {{/if}}
+          
     
      </form>
         <p>
-    <b onclick="toggle()" class="pointer"><a href="/">Back to Login Page</a></b>
+    <b onclick="toggle()" class="pointer" style="text-align: center;"><a href="/">Back to Login Page</a></b>
       </p>
+      
+      {{!-- newly added --}}
+               
+
+
+
+
 	</div>
  </div>
 			
 </div>
+
+
+<script>
+    var timeLeft = 30;
+    var timer = document.getElementById('resendOtp');
+    var timeId = setInterval(countdown, 1000);
+
+    function countdown() {
+        if (timeLeft === -1) {
+            clearTimeout(timeId);
+            working();
+        } else {
+            timer.innerHTML = timeLeft + ' seconds remaining';
+            timeLeft--;
+        }
+    }
+
+    function working() {
+        timer.style.display = 'none';
+        var showResendOtp = document.getElementById('resendButton');
+        showResendOtp.style.display = 'block';
+    }
+</script>

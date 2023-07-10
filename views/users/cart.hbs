@@ -108,6 +108,8 @@
                                            
                                              <li class="nav-item active"><a class="nav-link"   href="#">Mobiles</a></li>
                                            <li class="nav-item active"><a class="nav-link" href="#"> Laptops</a></li>
+                                           										      <li class="nav-item active"><a class="nav-link"   href="/shop">SHOP</a></li>
+
                                         </li>
                                         {{!-- <li class="nav-item"><a class="nav-link" href="/checkout">Checkout</a></li> --}}
                                         {{!-- <span class="karl-level">hot</span> --}}
@@ -224,7 +226,10 @@
                                             </div>
 
                                         </td>
-                                        <td class="total_price"><span>₹{{total}}</span></td>
+                                        <td class="total" id="productTotal_{{this._id}}">
+                    <span class="productTotal">{{total}}</span>
+                  </td>
+                                        {{!-- <td class="total_price"><span>₹{{total}}</span></td> --}}
                                     </tr>
                                     {{/each}}
                                 </tbody>
@@ -476,10 +481,13 @@
           const quantityInput = document.getElementById(`quantityInput_${proId}`);
           quantityInput.value = response.quantity;
 
+          const productTotalElement = $('#productTotal_' + proId).find('.productTotal');
+          productTotalElement.text(response.productTotal);
+
           const productTotal = document.querySelector(`#productTotal_${proId}`);
           productTotal.textContent = response.productTotal;
 
-          const subtotal = document.getElementById(`summary`);
+          const subtotal = document.getElementById (`summary`);
           subtotal.textContent = response.subtotal;
 
           const summarySubtotal = document.getElementById(`summary-subtotal`);
