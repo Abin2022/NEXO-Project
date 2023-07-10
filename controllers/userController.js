@@ -31,6 +31,8 @@ var instance = new Razorpay({
 // const userHelpers=require("../helpers/userHelpers")
 const productHelper=require("../helpers/productHelper")
 
+const userHelpers = require('../helpers/userHelpers')
+// const couponHelpers = require('../helpers/couponHelpers')
 
 
 
@@ -1394,6 +1396,7 @@ const placeOrder= async (req, res) => {
             console.log("cod_is true here");
             res.json({ COD_CHECKOUT: true });
           } else if (req.body["paymentMethod"] === "ONLINE") {
+             
             productHelper
               .generateRazorpayOrder(orderId, totalOrderValue)
               .then(async (razorpayOrderDetails) => {
@@ -1439,6 +1442,33 @@ const orderFailed = async (req, res) => {
   }
 }
 
+//verify payement
+const verifyPayment = async (req, res) => {
+  userHelpers.verifyOnlinePayment(req.body).then(() => {
+      let receiptId = req.body['serverOrderDetails[receipt]'];
+
+      let paymentSuccess = true;
+      userHelpers.updateOnlineOrderPaymentStatus(receiptId, paymentSuccess).then(() => {
+          // Sending the receiptId to the above userHelper to modify the order status in the DB
+          // We have set the Receipt Id is same as the orders cart collection ID
+
+          res.json({ status: true });
+      })
+      
+  }).catch((err) => {
+      if (err) {
+          console.log(err);
+
+          let paymentSuccess = false;
+          userHelpers.updateOnlineOrderPaymentStatus(receiptId, paymentSuccess).then(() => {
+              // Sending the receiptId to the above userHelper to modify the order status in the DB
+              // We have set the Receipt Id is same as the orders cart collection ID
+
+              res.json({ status: false });
+          })
+      }
+  })
+}
 
 
 
@@ -1516,7 +1546,7 @@ const loadOrdersView = async (req, res) => {
 
     const subtotal = order.orderValue;
     const cancellationStatus = order.cancellationStatus
-    console.log(cancellationStatus,'cancellationStatus');
+    // console.log(cancellationStatus,'cancellationStatus');
    
     console.log(subtotal, 'subtotal');
     
@@ -1561,7 +1591,6 @@ const cancelOrder = async (req, res) => {
 
 const undoCancel = async (req, res) => {
   try {
-    console.log("Entered into undo cacncel metheod...................................................................................");
     const id = req.body.orderId;
     const url = '/ordersView?id=' + id;
 
@@ -1688,7 +1717,7 @@ module.exports={
  placeOrder,
  orderPlaced,
  orderFailed,
-
+ verifyPayment,
  changeAddress,
 
  

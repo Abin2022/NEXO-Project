@@ -106,8 +106,9 @@ module.exports = {
         currency: "INR",
         receipt: orderId,
       };
-      instance.orders.create(orderDetails, function (err, order) {
-        console.log("New order :", order);
+      instance.orders.create(orderDetails, function (err, orderDetails) {
+        console.log("New order :", +err);
+        
         resolve(orderDetails);
       });
     });

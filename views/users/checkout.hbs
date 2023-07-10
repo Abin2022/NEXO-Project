@@ -823,12 +823,12 @@
             let orderDetails = serverOrderData.orderDetails;
             let userDetails = serverOrderData.userDetails;
             let userOrderRequestData = serverOrderData.userOrderRequestData;
-
+        console.log(orderDetails.id,"orderDetails.id")
             let paymentDataToRazorpayServer = {
                 "key": razorpayKeyId,
                 "amount": orderDetails.amount,
                 "currency": "INR",
-                "name": "NEXO-PROJECT-COPY",
+                "name": "NEXO-PROJECT",
                 "description": "Test Transaction",
                 "order_id": orderDetails.id,
                 "handler": function (response) {
@@ -840,7 +840,7 @@
                     "contact": userOrderRequestData.mobile
                 },
                 "notes": {
-                    "Customer Address": userOrderRequestData.homeAddress
+                    "Customer Address": userOrderRequestData.address
                 }
             };
 
@@ -852,16 +852,18 @@
 
         function verifyPayment(razorpayServerPaymentResponse, serverOrderDetails) {
             $.ajax({
+               
                 url: '/verify-payment',
                 data: {
 
                     razorpayServerPaymentResponse,
 
                     serverOrderDetails
+                    
 
                 },
                 method: 'POST',
-
+                  
                 success: (response) => {
                     if (response.status) {
                         location.href = '/orderPlaced'

@@ -71,9 +71,10 @@ router.post('/add-new-address',userControllers.addNewAddress)
 
  // in checkout page
  router.post('/place-order',auth.isLogin,userControllers.placeOrder)
-
   router.get('/orderPlaced',auth.isLogin,userControllers.orderPlaced);
   router.get('/orderFailed',auth.isLogin,userControllers.orderFailed)
+  
+  router.post('/verify-payment',auth.isLogin,userControllers.verifyPayment)
 
 
 
@@ -88,7 +89,6 @@ router.post('/add-new-address',userControllers.addNewAddress)
 router.get('/cart',auth.isLogin,userControllers.getCart)
 router.post('/change-product-quantity',userControllers.changeQuantity)
 // router.post('/delete-product-from-cart',userControllers.deleteProduct)
-
 // router.get('/checkout',auth.isLogin,userControllers.checkoutPage)
 
 router.post('/apply-coupon-request', couponController.applyCouponPOST);
