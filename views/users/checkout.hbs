@@ -273,34 +273,10 @@
                         </li>
                         {{/each}}
                        
-                         <li class="list-group-item d-flex justify-content-between bg-light">
+                        <li class="list-group-item d-flex justify-content-between bg-light">
                             <div class="text-success">
-                                <h6 class="my-0">FREE</h6>
-                                <small>Shipping charge</small>
-                            </div>
-                            {{!-- <span class="text-success">-₹500</span> --}}
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between">
-                            <span>Total(INR)</span>
-                            <strong>₹{{this.subtotal}}</strong>
-                        </li>
-                    </ul>
-
-                     
-                    <form class="card p-2">
-                        <div class="input-group">
-                            <input type="text" class="form-control" placeholder="Promo code">
-                            <div class="input-group-append">
-                                <button type="submit" class="btn btn-secondary">Redeem</button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-                
-                 {{!-- <li class="list-group-item d-flex justify-content-between bg-light">
-                            <div class="text-success">
-                                <h6 class="my-0">Coupon code</h6>
-                                <small>EXAMPLECODE</small>
+                                <h6 class="my-0">Total Discount</h6>
+                                
                             </div>
                             <span class="text-success">-₹{{this.couponDiscount}}</span>
                         </li>
@@ -309,26 +285,25 @@
                             <strong>₹{{this.subtotal}}</strong>
                         </li>
                     </ul>
-                    <form class="card p-2" action="/apply-coupon-request" method="POST">
+                    <form class="card p-2" action="/apply-coupon" method="POST">
                         <div class="input-group">
-                            <input type="text" class="form-control" placeholder="Coupon code" name="couponCodeFromUser">
+                            <input type="text" class="form-control" placeholder="Enter the Coupon Code Here" name="couponCodeFromUser" style="width: 200px;">
                             {{#if couponApplied}}
-
-                            <p style="color: #c3b1ad;"><b>{{couponApplied}}</b></p>
+                              
+                            <p style="color: #21b503;"><b>{{couponApplied}}</b></p>
 
                             {{else if couponError}}
-
+                        
                             <p style="color: red;"><b>{{couponError}}</b></p>
 
                             {{/if}}
                             <div class="input-group-append">
-                                <button type="submit" class="btn btn-secondary">Redeem</button>
+                                <button type="submit" class="btn btn-secondary" >Redeem</button>
                             </div>
                         </div>
                     </form>
-                </div> --}}
+                </div>
                 {{/if}}
-  
 
 
                 
@@ -413,16 +388,7 @@
                         <hr class="mb-4">
                         <h4 class="mb-3" style="color: #343a40;">Payment</h4>
                         <div class="d-block my-3">
-                            {{!-- <div class="custom-control custom-radio">
-                                <input id="credit" name="paymentMethod" type="radio" class="custom-control-input"
-                                    checked="" required="" value="COD" style="color: #343a40;">
-                                <label class="custom-control-label" for="credit">COD</label>
-                            </div>
-                            <div class="custom-control custom-radio">
-                                <input id="debit" name="paymentMethod" type="radio" class="custom-control-input"
-                                    required="" style="color: #343a40;">
-                                <label class="custom-control-label" for="debit">ONLINE</label>
-                            </div> --}}
+                           
                               <div class="custom-control custom-radio">
                                 <input id="credit" name="paymentMethod" type="radio" class="custom-control-input"
                                     checked="" required="" value="COD">

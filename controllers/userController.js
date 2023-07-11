@@ -17,7 +17,7 @@ const moment = require("moment-timezone")
 // const EventEmitter = require('events');
 
 const accountSid = "ACa547f4ad75438fee11d6c1f2b5cc0a4a";
-const authToken = '647edba3ddf54539cd2d7e72cb91b431';
+const authToken = 'b4f8c60f86294106865dc4400a08c08f';
 const verifySid = "VAb65553a60d1c6c15f8fb69e14c75d2f9";
 const client = require("twilio")(accountSid, authToken);
 
@@ -32,6 +32,7 @@ var instance = new Razorpay({
 const productHelper=require("../helpers/productHelper")
 
 const userHelpers = require('../helpers/userHelpers')
+const couponHelper = require("../helpers/couponHelper")
 // const couponHelpers = require('../helpers/couponHelpers')
 
 
@@ -799,6 +800,7 @@ const deleteProduct= async (req, res) => {
 
 const blockUser=async(req,res)=>{
   try{
+    
   res.render('users/block')
 
   }catch(error){
@@ -1226,10 +1228,34 @@ const loadCheckout= async (req, res) => {
           (sum, product) => sum + Number(product.total),
           0
       );
-      const finalAmount = total;
+      let finalAmount = total;
       // Get the total count of products
-      const totalCount = products.length;
+      let totalCount = products.length;
 
+      //coupon requested by user 
+      let couponError=false;
+      let couponApplied= false;
+
+      if (req.session.couponInvalidError){
+        couponError = req.session.couponInvalidError;
+
+      }else if(req.session.couponApplied){
+
+           couponApplied = req.session.couponApplied
+        }
+
+      //valid coupon check and discount amount calculation with the helper-coupon
+      let couponDiscount = 0;
+      const eligibleCoupon = await couponHelper.checkCurrentCouponValidityStatus(userId,finalAmount);
+
+      if(eligibleCoupon.status){
+        couponDiscount= eligibleCoupon.couponDiscount
+      }else{
+        couponDiscount=0;
+      }
+     
+
+      finalAmount=finalAmount-couponDiscount
 
       res.render('users/checkout',
           {
@@ -1238,9 +1264,14 @@ const loadCheckout= async (req, res) => {
               products,
               total,
               totalCount,
-              subtotal: total,
-              finalAmount,
+              couponApplied,
+              couponError,
+              couponDiscount,
+              subtotal: finalAmount,
+              // finalAmount,
           });
+          delete req.session.couponApplied;
+          delete req.session.couponInvalidError
 
         }
 
@@ -1375,7 +1406,55 @@ const changeAddress= async (req, res) => {
 
 //place oreder
 
-const placeOrder= async (req, res) => {
+// const placeOrder= async (req, res) => {
+//   try {
+//     console.log("entered placed order routeeeee");
+//     let userId = req.session.user_id;
+//     let orderDetails = req.body;
+//     console.log(orderDetails, "ordeerdetails have reached here");
+
+//     let productsOrdered = await productHelper.getProductListForOrders(userId);
+//     console.log(productsOrdered, "products that are ordered");
+
+//     if (productsOrdered) {
+//       let totalOrderValue = await productHelper.getCartValue(userId);
+//       console.log(totalOrderValue, "this is the total order value");
+
+//       productHelper.placingOrder(userId, orderDetails, productsOrdered, totalOrderValue).then((orderId) => {
+//           console.log("successfully reached hereeeeeeeeee");
+//           if (req.body["paymentMethod"] === "COD") {
+//             console.log("cod_is true here");
+//             res.json({ COD_CHECKOUT: true });
+//           } else if (req.body["paymentMethod"] === "ONLINE") {
+             
+//             productHelper
+//               .generateRazorpayOrder(orderId, totalOrderValue)
+//               .then(async (razorpayOrderDetails) => {
+//                 const user = await User.findById({ _id: userId }).lean();
+//                 res.json({
+//                   ONLINE_CHECKOUT: true,
+//                   userDetails: user,
+//                   userOrderRequestData: orderDetails,
+//                   orderDetails: razorpayOrderDetails,
+//                   razorpayKeyId: "rzp_test_vohNN97b9WnKIu",
+//                 });
+//               });
+//           } else {
+//             res.json({ paymentStatus: false });
+//           }
+//         });
+//     } else {
+//       res.json({ checkoutStatus: false });
+     
+//     }
+//     console.log(checkoutStatus);
+//   } catch (error) {
+//     console.log(error.message);
+//   }
+// }
+
+
+const placeOrder = async (req, res) => {
   try {
     console.log("entered placed order routeeeee");
     let userId = req.session.user_id;
@@ -1388,41 +1467,52 @@ const placeOrder= async (req, res) => {
     if (productsOrdered) {
       let totalOrderValue = await productHelper.getCartValue(userId);
       console.log(totalOrderValue, "this is the total order value");
-      productHelper
-        .placingOrder(userId, orderDetails, productsOrdered, totalOrderValue)
-        .then((orderId) => {
-          console.log("successfully reached hereeeeeeeeee");
-          if (req.body["paymentMethod"] === "COD") {
-            console.log("cod_is true here");
-            res.json({ COD_CHECKOUT: true });
-          } else if (req.body["paymentMethod"] === "ONLINE") {
-             
-            productHelper
-              .generateRazorpayOrder(orderId, totalOrderValue)
-              .then(async (razorpayOrderDetails) => {
-                const user = await User.findById({ _id: userId }).lean();
-                res.json({
-                  ONLINE_CHECKOUT: true,
-                  userDetails: user,
-                  userOrderRequestData: orderDetails,
-                  orderDetails: razorpayOrderDetails,
-                  razorpayKeyId: "rzp_test_vohNN97b9WnKIu",
-                });
+
+      const availableCouponData = await couponHelper.checkCurrentCouponValidityStatus(userId, totalOrderValue);
+      if (availableCouponData.status) {
+        const couponDiscountAmount = availableCouponData.couponDiscount;
+
+        // Inserting the value of coupon discount into the order details object created above
+        orderDetails.couponDiscount = couponDiscountAmount;
+
+        // Updating the total order value with coupon discount applied
+        totalOrderValue = totalOrderValue - couponDiscountAmount;
+
+        const updateCouponUsedStatusResult = await couponHelper.updateCouponUsedStatus(userId, availableCouponData.couponId);
+      }
+
+      productHelper.placingOrder(userId, orderDetails, productsOrdered, totalOrderValue).then((orderId) => {
+        console.log("successfully reached hereeeeeeeeee");
+        if (req.body["paymentMethod"] === "COD") {
+          console.log("cod_is true here");
+          res.json({ COD_CHECKOUT: true });
+        } else if (req.body["paymentMethod"] === "ONLINE") {
+
+          productHelper
+            .generateRazorpayOrder(orderId, totalOrderValue)
+            .then(async (razorpayOrderDetails) => {
+              const user = await User.findById({ _id: userId }).lean();
+              res.json({
+                ONLINE_CHECKOUT: true,
+                userDetails: user,
+                userOrderRequestData: orderDetails,
+                orderDetails: razorpayOrderDetails,
+                razorpayKeyId: "rzp_test_vohNN97b9WnKIu",
               });
-          } else {
-            res.json({ paymentStatus: false });
-          }
-        });
+            });
+        } else {
+          res.json({ paymentStatus: false });
+        }
+      });
     } else {
       res.json({ checkoutStatus: false });
-     
+
     }
     console.log(checkoutStatus);
   } catch (error) {
     console.log(error.message);
   }
 }
-
 
 
 const orderPlaced = async (req, res) => {
@@ -1454,7 +1544,7 @@ const verifyPayment = async (req, res) => {
 
           res.json({ status: true });
       })
-      
+
   }).catch((err) => {
       if (err) {
           console.log(err);

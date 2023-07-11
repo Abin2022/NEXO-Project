@@ -3,10 +3,11 @@ const Category = require('../models/categoryModel');
 const Product = require('../models/productModel');
 const Coupon = require('../models/couponModel')
 const mongoose = require('mongoose');
+const cartModel = require('../models/cartModel')
 // const admin=require('../models/adminModel')
 const ObjectId = mongoose.Types.ObjectId;
-// const couponHelpers = require('../helpers/couponHelper')
-
+ const couponHelpers = require('../helpers/couponHelper')
+const userHelpers=require("../helpers/userHelpers")
 //manage 
 const manageCoupon = async (req, res) => {
     console.log(manageCoupon,"entered into mangeCoupon section...");
@@ -219,14 +220,15 @@ const addNewCoupon = async (req, res) => {
   
 
  //user side 
- const applyCouponPOST = async(req,res)=>{
+
+
+ const applyCouponOnUserside = async(req,res)=>{
   try {
       const userId = req.session.user_id;
       const couponCode  = req.body.couponCodeFromUser.toLowerCase();
       const couponData = await couponHelpers.getCouponDataByCouponCode(couponCode);
       const couponEligible = await couponHelpers.verifyCouponEligibility(couponCode);
-
-
+   
       if(couponEligible.status){
           const cartValue = await userHelpers.getCartValue(userId);
           if(cartValue >= couponData.minOrderValue){
@@ -241,6 +243,7 @@ const addNewCoupon = async (req, res) => {
                       req.session.couponInvalidError = "Sorry, Unexpected Error in applying coupon";
 
                       res.redirect('/checkout');
+                      
 
                   }
               }else{
@@ -278,7 +281,7 @@ const addNewCoupon = async (req, res) => {
     editCouponPage,
     updateCoupon,
     changeCouponStatus,
-    applyCouponPOST,
+    applyCouponOnUserside,
 
   };
   

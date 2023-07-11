@@ -1,10 +1,11 @@
 const config = require('../config/config');
 const User = require('../models/userModel');
-const Order = require('../models/ordersModel')
+const Order = require('../models/orderModel')
 const Coupon = require('../models/couponModel')
-const UsedCoupon = require('../models/usedCouponModel')
+ const UsedCoupon = require('../models/usedCouponModel')
 const mongoose = require('mongoose');
 const ObjectId = mongoose.Types.ObjectId;
+const cartModel = require('../models/cartModel')
 
 
 module.exports = {
@@ -39,6 +40,8 @@ getCouponDataByCouponCode: (couponCode) => {
     })
 
 },
+
+
 
 verifyCouponEligibility: (requestedCouponCode) => {
     return new Promise(async (resolve, reject) => {
@@ -180,6 +183,10 @@ applyCouponToCart: (userId, couponId) => {
         }
     })
 },
+
+
+
+//next  sections
 
 checkCurrentCouponValidityStatus: (userId, cartValue) => {
     return new Promise(async (resolve, reject) => {

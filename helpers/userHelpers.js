@@ -2,6 +2,7 @@ const User = require('../models/userModel');
 const Category = require('../models/categoryModel')
 const Product = require('../models/productModel')
 const Order =require('../models/orderModel')
+const cartModel = require('../models/cartModel')
 
 const Razorpay = require("razorpay");
 const { ObjectId } = require('mongodb');
@@ -10,6 +11,7 @@ var instance = new Razorpay({
 
     key_secret: 'yXjHwM7lO6wpSg5aVdD6tsbF',
 });
+
 
 
 
@@ -69,6 +71,25 @@ updateOnlineOrderPaymentStatus: (ordersCollectionId, onlinePaymentStatus) => {
     
 },
 
+
+ getCartValue:(userId)=>{
+    return new Promise(async(resolve,reject)=>{
+    try{
+        const productDetails = await cartModel.findOne({ user_id:userId})
+
+        const subtotal=productDetails.products.reduce((acc,product)=>{
+            return acc+product.total
+        },0)
+        if(subtotal){
+            resolve(subtotal)
+        }else{
+            resolve(false)
+        }
+    }catch(error){
+        reject(error)
+    }
+    })
+ },
 
 
 }

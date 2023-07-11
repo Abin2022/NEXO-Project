@@ -89,9 +89,9 @@ router.post('/add-new-address',userControllers.addNewAddress)
 router.get('/cart',auth.isLogin,userControllers.getCart)
 router.post('/change-product-quantity',userControllers.changeQuantity)
 // router.post('/delete-product-from-cart',userControllers.deleteProduct)
-// router.get('/checkout',auth.isLogin,userControllers.checkoutPage)
 
-router.post('/apply-coupon-request', couponController.applyCouponPOST);
+
+router.post('/apply-coupon', couponController.applyCouponOnUserside);
 
 router.get('/block',userControllers.blockUser)
 router.get('/shop',auth.isLogin,userControllers.loadShopPage)

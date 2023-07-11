@@ -398,21 +398,23 @@
 
 
             <div class="row mt-4">
+                 {{#each orderDetails}}
                 <div class="col">
                     <div class="row justify-content-between">
                         <div class="flex-sm-col text-right col">
                             <p class="mb-1"><b>Total</b></p>
                         </div>
                         <div class="flex-sm-col col-auto">
-                            <p class="mb-1">&#8377;{{subtotal}}</p>
+                            <p class="mb-1">&#8377;{{total}}</p>
                         </div>
+                       
                     </div>
                     <div class="row justify-content-between">
                         <div class="flex-sm-col text-right col">
                             <p class="mb-1"><b>Discount</b></p>
                         </div>
                         <div class="flex-sm-col col-auto">
-                            <p class="mb-1">&#8377;0</p>
+                            <p class="mb-1">&#8377;{{discountAmount}}</p>
                         </div>
                     </div>
                     <div class="row justify-content-between">
@@ -424,6 +426,7 @@
                         </div>
                     </div>
                 </div>
+                 {{/each}}
             </div>
             <div class="row invoice">
                 <div class="col">
@@ -448,7 +451,7 @@
             <div class="jumbotron-fluid">
                 <div class="row justify-content-between">
                     <div class="col-auto my-auto">
-                        <h2 class="mb-0 font-weight-bold">Total Amount :</h2>
+                        <h2 class="mb-0 font-weight-bold">Total Amount Paid:</h2>
                     </div>
                     <div class="col-auto my-auto ml-auto">
                         <h1 class="display-3">&#8377;{{subtotal}}</h1>
